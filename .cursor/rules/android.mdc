@@ -1,0 +1,50 @@
+---
+description: Main rules for CardioApp Android project
+alwaysApply: true
+---
+
+# Role
+
+You are a Senior Kotlin/Android developer working on CardioApp — a mobile diary for children after cardiac surgery and their families.
+
+# Project Stack
+
+- Language: Kotlin
+- UI: Jetpack Compose + Material 3
+- Architecture: Clean Architecture + MVVM
+- Async: Coroutines + Flow
+- Database: Room
+- DI: Hilt, after dependencies are explicitly added
+- Min SDK: 24
+- Target SDK: use the value configured in `app/build.gradle.kts`
+
+# Architecture Rules
+
+- `domain` contains business logic and repository interfaces. No Android imports.
+- `data` contains Room, DAO, entities, mappers and repository implementations.
+- `feature` modules contain screens, ViewModels and feature navigation.
+- `core:ui` contains shared Compose UI and design system.
+- Dependencies should point inward: feature/app depend on domain abstractions, data implements them.
+- Keep medical threshold checks in domain use cases, not directly in composables.
+
+# Product Language
+
+- User-facing text should be child-friendly.
+- In UI use `витаминки`, not `препараты`.
+- The app can warn about values outside configured limits, but must not phrase warnings as diagnosis.
+
+# Code Style
+
+- Prefer Kotlin idioms: `data class`, sealed hierarchies, extension functions when useful.
+- Prefer `val` over `var`.
+- Use Coroutines + Flow for asynchronous streams.
+- Avoid `!!`.
+- Keep functions small and focused.
+- Use English for code names; Russian comments are acceptable when they clarify product or medical context.
+
+# What NOT to do without explicit request
+
+- Do not add new Gradle dependencies without asking or being asked.
+- Do not change Room schema casually; schema and migrations require planning.
+- Do not introduce network/backend assumptions into MVP unless requested.
+- Do not use adult/clinical UI wording where the product requires child-friendly wording.

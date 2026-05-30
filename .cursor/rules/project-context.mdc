@@ -1,0 +1,38 @@
+---
+description: Project structure and current state of CardioApp
+alwaysApply: true
+---
+
+# Project Context
+
+CardioApp — Android-приложение для сопровождения детей после кардиохирургических операций.
+
+Основной проектный документ: `.cursor/docs/PROJECT.md`.
+Продуктовый паспорт: `.cursor/docs/НИИ_КПСЗ_Паспорт_проекта_МП_Дневник_сопровождения.md`.
+
+## MVP
+
+- Главный раздел `Сегодня`: карточки показателей, витаминок и опроса.
+- Раздел `История`: история показателей и приемов витаминок.
+- Раздел `Помощь`: телефоны и вопросы-ответы.
+- Показатели: давление, дыхание, пульс, кислород.
+- В UI использовать слово `витаминки`, не `препараты`.
+
+## Architecture Direction
+
+- Kotlin, Jetpack Compose, Material 3.
+- Clean Architecture + MVVM.
+- Локальное хранение MVP: Room для дневниковых данных, DataStore для локального профиля пользователя.
+- Целевая модульность: `:app`, `:core:*`, `:feature:*`.
+- Ориентир по модульности: Now in Android, но без чрезмерного дробления.
+
+## Current State
+
+- Репозиторий настроен как многомодульный проект: `:app`, `:core:*`, `:feature:*`.
+- Созданы domain-модели и repository-интерфейсы для MVP; use case оставляем только для реальной бизнес-логики.
+- Подключен Room в `:core:database`, реализованы entity/DAO/database и seed-данные для тестовой группы `10-11 лет`.
+- Профиль текущего пользователя хранится через DataStore, не в Room.
+- `:core:data` содержит repository implementations и mappers.
+- `MainActivity` показывает базовый Compose-каркас с нижней навигацией `Сегодня`, `История`, `Помощь`.
+- `:feature:today` уже читает данные через domain-репозитории.
+- Hilt подключен для DI: database/DAO/repository предоставляются через модули `:core:data`, `TodayViewModel` использует `@HiltViewModel`.

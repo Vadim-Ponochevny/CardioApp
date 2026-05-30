@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="920" viewBox="0 0 1280 920">
+  <defs>
+    <style>
+      .bg { fill: #f7f9fc; }
+      .table { fill: #ffffff; stroke: #2b3a55; stroke-width: 2; rx: 14; }
+      .title { fill: #20304a; font: 700 18px Arial, sans-serif; }
+      .field { fill: #26364f; font: 14px Arial, sans-serif; }
+      .note { fill: #5d6b82; font: 12px Arial, sans-serif; }
+      .line { stroke: #52627a; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .label { fill: #52627a; font: 12px Arial, sans-serif; }
+      .group { fill: #eaf1ff; stroke: #9db8ee; stroke-width: 1.5; rx: 10; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#52627a" />
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1280" height="920" />
+  <text class="title" x="40" y="42">CardioApp MVP database schema</text>
+  <text class="note" x="40" y="64">Room schema draft, version 1. User profile is stored in DataStore, not Room.</text>
+
+  <rect class="group" x="28" y="88" width="388" height="160" />
+  <rect class="table" x="48" y="108" width="348" height="120" />
+  <text class="title" x="68" y="136">DataStore: user_profile</text>
+  <text class="field" x="68" y="166">patientExternalId: String</text>
+  <text class="field" x="68" y="188">birthDate: String yyyy-MM-dd</text>
+  <text class="field" x="68" y="210">ageGroup, userType: String</text>
+
+  <rect class="group" x="450" y="88" width="385" height="252" />
+  <rect class="table" x="470" y="108" width="345" height="212" />
+  <text class="title" x="490" y="136">health_records</text>
+  <text class="field" x="490" y="166">PK id: String</text>
+  <text class="field" x="490" y="188">patientId: String</text>
+  <text class="field" x="490" y="210">createdAt, updatedAt: Long</text>
+  <text class="field" x="490" y="232">systolicPressure: Int</text>
+  <text class="field" x="490" y="254">diastolicPressure: Int</text>
+  <text class="field" x="490" y="276">respiratoryRate: Int</text>
+  <text class="field" x="490" y="298">heartRate, oxygenSaturation: Int</text>
+
+  <rect class="group" x="872" y="88" width="380" height="204" />
+  <rect class="table" x="892" y="108" width="340" height="164" />
+  <text class="title" x="912" y="136">single_metric_limits</text>
+  <text class="field" x="912" y="166">PK id: String</text>
+  <text class="field" x="912" y="188">ageGroup, metricType: String</text>
+  <text class="field" x="912" y="210">normalMin, normalMax: Int</text>
+  <text class="field" x="912" y="232">attentionMin, attentionMax: Int?</text>
+  <text class="field" x="912" y="254">doctorSoonMin, doctorSoonMax: Int?</text>
+  <text class="note" x="912" y="278">Unique: ageGroup + metricType</text>
+
+  <rect class="group" x="872" y="320" width="380" height="226" />
+  <rect class="table" x="892" y="340" width="340" height="186" />
+  <text class="title" x="912" y="368">blood_pressure_limits</text>
+  <text class="field" x="912" y="398">PK id: String</text>
+  <text class="field" x="912" y="420">ageGroup: String</text>
+  <text class="field" x="912" y="442">normalSystolicMin/Max: Int</text>
+  <text class="field" x="912" y="464">normalDiastolicMin/Max: Int</text>
+  <text class="field" x="912" y="486">doctorSoonSystolicLow/High: Int</text>
+  <text class="field" x="912" y="508">doctorSoonDiastolicLow/High: Int</text>
+  <text class="note" x="912" y="532">Unique: ageGroup</text>
+
+  <rect class="group" x="28" y="300" width="388" height="176" />
+  <rect class="table" x="48" y="320" width="348" height="136" />
+  <text class="title" x="68" y="348">vitamins</text>
+  <text class="field" x="68" y="378">PK id: String</text>
+  <text class="field" x="68" y="400">patientId: String</text>
+  <text class="field" x="68" y="422">name: String</text>
+  <text class="field" x="68" y="444">dose: String?</text>
+
+  <rect class="group" x="450" y="400" width="385" height="182" />
+  <rect class="table" x="470" y="420" width="345" height="142" />
+  <text class="title" x="490" y="448">vitamin_intake_days</text>
+  <text class="field" x="490" y="478">PK id: String</text>
+  <text class="field" x="490" y="500">patientId: String</text>
+  <text class="field" x="490" y="522">date: String yyyy-MM-dd</text>
+  <text class="field" x="490" y="544">createdAt, updatedAt: Long</text>
+  <text class="note" x="490" y="568">Unique: patientId + date</text>
+
+  <rect class="group" x="872" y="584" width="380" height="204" />
+  <rect class="table" x="892" y="604" width="340" height="164" />
+  <text class="title" x="912" y="632">vitamin_intakes</text>
+  <text class="field" x="912" y="662">PK id: String</text>
+  <text class="field" x="912" y="684">FK intakeDayId: String</text>
+  <text class="field" x="912" y="706">FK vitaminId: String</text>
+  <text class="field" x="912" y="728">isTaken: Boolean</text>
+  <text class="field" x="912" y="750">takenAt: Long?, updatedAt: Long</text>
+  <text class="note" x="912" y="774">Unique: intakeDayId + vitaminId</text>
+
+  <rect class="group" x="28" y="560" width="388" height="176" />
+  <rect class="table" x="48" y="580" width="348" height="136" />
+  <text class="title" x="68" y="608">survey_links</text>
+  <text class="field" x="68" y="638">PK id: String</text>
+  <text class="field" x="68" y="660">title: String</text>
+  <text class="field" x="68" y="682">url: String</text>
+  <text class="field" x="68" y="704">isActive, createdAt, updatedAt</text>
+
+  <rect class="group" x="450" y="660" width="385" height="184" />
+  <rect class="table" x="470" y="680" width="345" height="144" />
+  <text class="title" x="490" y="708">help_contacts</text>
+  <text class="field" x="490" y="738">PK id: String</text>
+  <text class="field" x="490" y="760">title, phone: String</text>
+  <text class="field" x="490" y="782">description: String?</text>
+  <text class="field" x="490" y="804">sortOrder: Int, isActive: Boolean</text>
+
+  <rect class="group" x="28" y="760" width="388" height="136" />
+  <rect class="table" x="48" y="780" width="348" height="96" />
+  <text class="title" x="68" y="808">faqs</text>
+  <text class="field" x="68" y="838">PK id: String</text>
+  <text class="field" x="68" y="860">question, answer, sortOrder, isActive</text>
+
+  <path class="line" d="M396 178 C430 178, 432 188, 470 188" />
+  <text class="label" x="410" y="166">profile id</text>
+  <path class="line" d="M222 228 C222 260, 222 282, 222 320" />
+  <text class="label" x="236" y="280">profile id</text>
+  <path class="line" d="M396 210 C518 260, 772 168, 892 188" />
+  <text class="label" x="610" y="178">ageGroup</text>
+  <path class="line" d="M396 210 C560 322, 734 420, 892 420" />
+  <text class="label" x="618" y="336">ageGroup</text>
+  <path class="line" d="M396 400 C430 468, 432 500, 470 500" />
+  <text class="label" x="410" y="452">profile id</text>
+  <path class="line" d="M815 522 C852 522, 854 684, 892 684" />
+  <text class="label" x="834" y="594">1 to many</text>
+  <path class="line" d="M396 400 C630 400, 650 706, 892 706" />
+  <text class="label" x="560" y="388">1 to many</text>
+</svg>

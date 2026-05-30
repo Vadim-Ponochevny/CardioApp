@@ -21,4 +21,14 @@ dependencyResolutionManagement {
 
 rootProject.name = "CardioApp"
 include(":app")
- 
+include(":core:common")
+include(":core:model")
+include(":core:domain")
+include(":core:database")
+include(":core:data")
+include(":core:ui")
+include(":feature:today")
+include(":feature:healthrecords")
+include(":feature:vitamins")
+include(":feature:history")
+include(":feature:help")

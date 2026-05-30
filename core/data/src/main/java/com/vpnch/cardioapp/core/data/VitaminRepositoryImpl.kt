@@ -1,0 +1,77 @@
+package com.vpnch.cardioapp.core.data
+
+import com.vpnch.cardioapp.core.database.dao.VitaminDao
+import com.vpnch.cardioapp.core.database.entity.VitaminIntakeDayEntity
+import com.vpnch.cardioapp.core.database.entity.VitaminIntakeEntity
+import com.vpnch.cardioapp.core.domain.VitaminRepository
+import com.vpnch.cardioapp.core.model.Vitamin
+import com.vpnch.cardioapp.core.model.VitaminIntakeSummary
+import java.util.UUID
+import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+
+class VitaminRepositoryImpl @Inject constructor(
+    private val vitaminDao: VitaminDao,
+) : VitaminRepository {
+
+    override fun observeVitamins(patientId: String): Flow<List<Vitamin>> {
+        return vitaminDao.observeVitamins(patientId).map { vitamins ->
+            vitamins.map { it.asExternalModel() }
+        }
+    }
+
+    override fun observeVitaminIntakes(
+        patientId: String,
+        date: String,
+    ): Flow<List<VitaminIntakeSummary>> {
+        return vitaminDao.observeVitaminIntakes(patientId, date).map { summaries ->
+            summaries.map { it.asExternalModel() }
+        }
+    }
+
+    override suspend fun getVitamin(vitaminId: String): Vitamin? {
+        return vitaminDao.getVitamin(vitaminId)?.asExternalModel()
+    }
+
+    override suspend fun saveVitamin(vitamin: Vitamin) {
+        vitaminDao.upsertVitamin(vitamin.asEntity())
+    }
+
+    override suspend fun deleteVitamin(vitaminId: String) {
+        vitaminDao.deleteVitamin(vitaminId)
+    }
+
+    override suspend fun setVitaminTaken(
+        patientId: String,
+        date: String,
+        vitaminId: String,
+        isTaken: Boolean,
+    ) {
+        val now = System.currentTimeMillis()
+        val intakeDay = vitaminDao.getIntakeDay(patientId, date) ?: createIntakeDay(patientId, date, now)
+        vitaminDao.upsertIntakeDay(intakeDay)
+        vitaminDao.upsertIntake(
+            VitaminIntakeEntity(
+                id = "${intakeDay.id}-$vitaminId",
+                intakeDayId = intakeDay.id,
+                vitaminId = vitaminId,
+                isTaken = isTaken,
+                takenAt = if (isTaken) now else null,
+                updatedAt = now,
+            ),
+        )
+    }
+
+    private fun createIntakeDay(
+        patientId: String,
+        date: String,
+        now: Long,
+    ) = VitaminIntakeDayEntity(
+        id = UUID.randomUUID().toString(),
+        patientId = patientId,
+        date = date,
+        createdAt = now,
+        updatedAt = now,
+    )
+}
