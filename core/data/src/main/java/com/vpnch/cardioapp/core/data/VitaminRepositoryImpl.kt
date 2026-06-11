@@ -6,6 +6,7 @@ import com.vpnch.cardioapp.core.database.entity.VitaminIntakeEntity
 import com.vpnch.cardioapp.core.domain.VitaminRepository
 import com.vpnch.cardioapp.core.model.Vitamin
 import com.vpnch.cardioapp.core.model.VitaminIntakeSummary
+import com.vpnch.cardioapp.core.model.TakenVitaminOnDate
 import java.util.UUID
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
@@ -27,6 +28,18 @@ class VitaminRepositoryImpl @Inject constructor(
     ): Flow<List<VitaminIntakeSummary>> {
         return vitaminDao.observeVitaminIntakes(patientId, date).map { summaries ->
             summaries.map { it.asExternalModel() }
+        }
+    }
+
+    override fun observeTakenVitaminsHistory(patientId: String): Flow<List<TakenVitaminOnDate>> {
+        return vitaminDao.observeTakenVitaminsHistory(patientId).map { rows ->
+            rows.map { row ->
+                TakenVitaminOnDate(
+                    date = row.date,
+                    vitaminId = row.vitaminId,
+                    vitaminName = row.vitaminName,
+                )
+            }
         }
     }
 

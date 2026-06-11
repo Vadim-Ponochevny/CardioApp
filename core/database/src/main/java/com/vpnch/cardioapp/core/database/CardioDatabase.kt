@@ -28,7 +28,7 @@ import com.vpnch.cardioapp.core.database.entity.VitaminIntakeEntity
         HelpContactEntity::class,
         FaqEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = false,
 )
 abstract class CardioDatabase : RoomDatabase() {

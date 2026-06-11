@@ -28,6 +28,15 @@ interface HealthRecordDao {
         SELECT * FROM health_records
         WHERE patientId = :patientId
         ORDER BY createdAt DESC
+        """,
+    )
+    fun observeAllRecords(patientId: String): Flow<List<HealthRecordEntity>>
+
+    @Query(
+        """
+        SELECT * FROM health_records
+        WHERE patientId = :patientId
+        ORDER BY createdAt DESC
         LIMIT 1
         """,
     )
@@ -35,6 +44,12 @@ interface HealthRecordDao {
 
     @Query("SELECT * FROM health_records WHERE id = :recordId")
     suspend fun getRecord(recordId: String): HealthRecordEntity?
+
+    @Query("SELECT * FROM health_records WHERE id = :recordId")
+    fun observeRecord(recordId: String): Flow<HealthRecordEntity?>
+
+    @Query("DELETE FROM health_records WHERE id = :recordId")
+    suspend fun deleteRecord(recordId: String)
 
     @Upsert
     suspend fun upsertRecord(record: HealthRecordEntity)

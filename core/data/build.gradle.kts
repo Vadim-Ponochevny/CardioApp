@@ -33,5 +33,6 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.hilt.android)
     implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.androidx.datastore.core.android)
     ksp(libs.hilt.compiler)
 }

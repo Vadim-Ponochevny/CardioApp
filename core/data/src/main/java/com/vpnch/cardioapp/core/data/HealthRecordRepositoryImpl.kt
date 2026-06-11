@@ -24,6 +24,12 @@ class HealthRecordRepositoryImpl @Inject constructor(
             .map { records -> records.map { it.asExternalModel() } }
     }
 
+    override fun observeAllRecords(patientId: String): Flow<List<HealthRecord>> {
+        return healthRecordDao.observeAllRecords(patientId).map { records ->
+            records.map { it.asExternalModel() }
+        }
+    }
+
     override fun observeLatestRecord(patientId: String): Flow<HealthRecord?> {
         return healthRecordDao.observeLatestRecord(patientId).map { it?.asExternalModel() }
     }
@@ -38,6 +44,14 @@ class HealthRecordRepositoryImpl @Inject constructor(
 
     override suspend fun updateRecord(record: HealthRecord) {
         healthRecordDao.upsertRecord(record.asEntity())
+    }
+
+    override suspend fun deleteRecord(recordId: String) {
+        healthRecordDao.deleteRecord(recordId)
+    }
+
+    override fun observeRecord(recordId: String): Flow<HealthRecord?> {
+        return healthRecordDao.observeRecord(recordId).map { it?.asExternalModel() }
     }
 
     override suspend fun getSingleMetricLimits(ageGroup: AgeGroup): List<SingleMetricLimits> {

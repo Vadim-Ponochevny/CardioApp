@@ -51,8 +51,8 @@ object SeedData {
     )
 
     val vitamins = listOf(
-        VitaminEntity("vitamin-1", PATIENT_ID, "Витаминка утром", "1 шт."),
-        VitaminEntity("vitamin-2", PATIENT_ID, "Витаминка вечером", "1 шт."),
+        VitaminEntity("vitamin-1", PATIENT_ID, "Йод", "1 шт."),
+        VitaminEntity("vitamin-2", PATIENT_ID, "Аспирин", "1 шт."),
     )
 
     val surveyLink = SurveyLinkEntity(
@@ -66,11 +66,19 @@ object SeedData {
 
     val helpContacts = listOf(
         HelpContactEntity(
-            id = "contact-lab",
-            title = "Кардиоцентр",
-            phone = "+7 000 000-00-00",
-            description = "Позвоните, если нужна помощь с дневником или показателями.",
+            id = "contact-doctor",
+            title = "Доктор",
+            phone = "+644580",
+            description = null,
             sortOrder = 0,
+            isActive = true,
+        ),
+        HelpContactEntity(
+            id = "contact-appointment",
+            title = "Запись на приём",
+            phone = "+780278",
+            description = null,
+            sortOrder = 1,
             isActive = true,
         ),
     )

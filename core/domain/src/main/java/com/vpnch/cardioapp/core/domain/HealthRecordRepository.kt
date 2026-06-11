@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.Flow
 interface HealthRecordRepository {
     fun observeRecordsForDate(patientId: String, date: String): Flow<List<HealthRecord>>
 
+    fun observeAllRecords(patientId: String): Flow<List<HealthRecord>>
+
     fun observeLatestRecord(patientId: String): Flow<HealthRecord?>
 
     suspend fun getRecord(recordId: String): HealthRecord?
@@ -16,6 +18,10 @@ interface HealthRecordRepository {
     suspend fun addRecord(record: HealthRecord)
 
     suspend fun updateRecord(record: HealthRecord)
+
+    suspend fun deleteRecord(recordId: String)
+
+    fun observeRecord(recordId: String): Flow<HealthRecord?>
 
     suspend fun getSingleMetricLimits(ageGroup: AgeGroup): List<SingleMetricLimits>
 

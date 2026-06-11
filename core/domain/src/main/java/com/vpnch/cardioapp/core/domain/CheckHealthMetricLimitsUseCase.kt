@@ -3,8 +3,10 @@ package com.vpnch.cardioapp.core.domain
 import com.vpnch.cardioapp.core.model.BloodPressureLimits
 import com.vpnch.cardioapp.core.model.MetricStatus
 import com.vpnch.cardioapp.core.model.SingleMetricLimits
+import javax.inject.Inject
 
-class CheckHealthMetricLimitsUseCase {
+class CheckHealthMetricLimitsUseCase @Inject constructor() {
+
     fun checkSingleValue(value: Int, limits: SingleMetricLimits?): MetricStatus {
         if (limits == null) return MetricStatus.Unknown
 

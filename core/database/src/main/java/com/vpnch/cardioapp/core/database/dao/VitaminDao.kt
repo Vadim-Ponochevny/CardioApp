@@ -7,6 +7,7 @@ import androidx.room.Upsert
 import com.vpnch.cardioapp.core.database.entity.VitaminEntity
 import com.vpnch.cardioapp.core.database.entity.VitaminIntakeDayEntity
 import com.vpnch.cardioapp.core.database.entity.VitaminIntakeEntity
+import com.vpnch.cardioapp.core.database.model.TakenVitaminHistoryRow
 import com.vpnch.cardioapp.core.database.model.VitaminIntakeSummaryEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -53,4 +54,19 @@ interface VitaminDao {
         """,
     )
     fun observeVitaminIntakes(patientId: String, date: String): Flow<List<VitaminIntakeSummaryEntity>>
+
+    @Query(
+        """
+        SELECT
+            vitamin_intake_days.date AS date,
+            vitamins.id AS vitaminId,
+            vitamins.name AS vitaminName
+        FROM vitamin_intakes
+        INNER JOIN vitamin_intake_days ON vitamin_intakes.intakeDayId = vitamin_intake_days.id
+        INNER JOIN vitamins ON vitamin_intakes.vitaminId = vitamins.id
+        WHERE vitamin_intake_days.patientId = :patientId AND vitamin_intakes.isTaken = 1
+        ORDER BY vitamin_intake_days.date DESC, vitamins.name ASC
+        """,
+    )
+    fun observeTakenVitaminsHistory(patientId: String): Flow<List<TakenVitaminHistoryRow>>
 }
