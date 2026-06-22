@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -42,6 +43,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.vpnch.cardioapp.core.model.VitaminIntakeSummary
 import com.vpnch.cardioapp.core.ui.theme.CardioTheme
 
@@ -160,145 +162,167 @@ private fun VitaminItemCard(
 
     // Диалог подтверждения ПРИЁМА (поставить галочку)
     if (showConfirmationDialog) {
-        AlertDialog(
-            onDismissRequest = { showConfirmationDialog = false },
-            title = {
-                Text(
-                    text = summary.vitamin.name,
-                    style = CardioTheme.typography.actionLabel,
-                    color = CardioTheme.colors.textMain,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
+        Dialog(
+            onDismissRequest = { showConfirmationDialog = false }
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(),
+//                    .padding(horizontal = 16.dp), // Уменьшаем внешние отступы
+                shape = RoundedCornerShape(36.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = CardioTheme.colors.onPrimary
                 )
-            },
-            text = {
-                Text(
-                    text = "Подтвердить приём?",
-                    style = CardioTheme.typography.bodyLarge,
-                    color = CardioTheme.colors.textMain,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
-            },
-            confirmButton = {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Button(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(72.dp),
-                        onClick = { showConfirmationDialog = false },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = CardioTheme.colors.textDisabled,
-                            contentColor = CardioTheme.colors.textMain
-                        ),
-                        shape = RoundedCornerShape(24.dp)
-                    ) {
-                        Text(
-                            text = "Нет",
-                            style = CardioTheme.typography.actionLabel,
-                            color = CardioTheme.colors.textMain
-                        )
-                    }
+                    Text(
+                        text = summary.vitamin.name,
+                        style = CardioTheme.typography.actionLabel,
+                        color = CardioTheme.colors.textMain,
+                        textAlign = TextAlign.Center
+                    )
 
-                    Button(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(72.dp),
-                        onClick = {
-                            showConfirmationDialog = false
-                            onCheckedChange(true)
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = CardioTheme.colors.primary,
-                            contentColor = CardioTheme.colors.onPrimary
-                        ),
-                        shape = RoundedCornerShape(24.dp)
+                    Text(
+                        text = "Подтвердить приём?",
+                        style = CardioTheme.typography.bodySmall,
+                        color = CardioTheme.colors.textMain,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text(
-                            text = "Да",
-                            style = CardioTheme.typography.actionLabel,
-                            color = CardioTheme.colors.onPrimary
-                        )
+                        Button(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(56.dp),
+                            onClick = { showConfirmationDialog = false },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = CardioTheme.colors.textDisabled,
+                                contentColor = CardioTheme.colors.textMain
+                            ),
+                            shape = RoundedCornerShape(24.dp)
+                        ) {
+                            Text(
+                                text = "Нет",
+                                style = CardioTheme.typography.bodyMedium,
+                                color = CardioTheme.colors.textMain
+                            )
+                        }
+
+                        Button(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(56.dp),
+                            onClick = {
+                                showConfirmationDialog = false
+                                onCheckedChange(true)
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF1DC44E),
+                                contentColor = CardioTheme.colors.onPrimary
+                            ),
+                            shape = RoundedCornerShape(24.dp)
+                        ) {
+                            Text(
+                                text = "Да",
+                                style = CardioTheme.typography.navLabel,
+                                color = CardioTheme.colors.onPrimary,
+                            )
+                        }
                     }
                 }
-            },
-            containerColor = CardioTheme.colors.onPrimary,
-            shape = RoundedCornerShape(36.dp)
-        )
+            }
+        }
     }
 
 // Диалог подтверждения ОТМЕНЫ (убрать галочку)
     if (showCancelDialog) {
-        AlertDialog(
-            onDismissRequest = { showCancelDialog = false },
-            title = {
-                Text(
-                    text = summary.vitamin.name,
-                    style = CardioTheme.typography.actionLabel,
-                    color = CardioTheme.colors.textMain,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
+        Dialog(
+            onDismissRequest = { showCancelDialog = false }
+        ) {
+            Card(
+                modifier = Modifier
+                    .wrapContentWidth() , // Увеличиваем ширину до 85% от экрана
+//                    .padding(horizontal = 16.dp), // Уменьшаем внешние отступы
+                shape = RoundedCornerShape(36.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = CardioTheme.colors.onPrimary
                 )
-            },
-            text = {
-                Text(
-                    text = "Отменить приём?",
-                    style = CardioTheme.typography.bodyLarge,
-                    color = CardioTheme.colors.textMain,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
-            },
-            confirmButton = {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Button(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(72.dp),
-                        onClick = { showCancelDialog = false },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = CardioTheme.colors.textDisabled,
-                            contentColor = CardioTheme.colors.textMain
-                        ),
-                        shape = RoundedCornerShape(24.dp)
-                    ) {
-                        Text(
-                            text = "Нет",
-                            style = CardioTheme.typography.actionLabel,
-                            color = CardioTheme.colors.textMain
-                        )
-                    }
+                    Text(
+                        text = summary.vitamin.name,
+                        style = CardioTheme.typography.actionLabel,
+                        color = CardioTheme.colors.textMain,
+                        textAlign = TextAlign.Center
+                    )
 
-                    Button(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(72.dp),
-                        onClick = {
-                            showCancelDialog = false
-                            onCheckedChange(false)
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = CardioTheme.colors.cardVitamins,
-                            contentColor = CardioTheme.colors.onPrimary
-                        ),
-                        shape = RoundedCornerShape(24.dp)
+                    Text(
+                        text = "Отменить приём?",
+                        style = CardioTheme.typography.bodySmall,
+                        color = CardioTheme.colors.textMain,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Row(
+                        modifier = Modifier.wrapContentWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text(
-                            text = "Отменить",
-                            style = CardioTheme.typography.actionLabel,
-                            color = CardioTheme.colors.onPrimary
-                        )
+                        Button(
+                            modifier = Modifier
+                                .wrapContentWidth()
+                                .height(56.dp),
+                            onClick = { showCancelDialog = false },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = CardioTheme.colors.textDisabled,
+                                contentColor = CardioTheme.colors.textMain
+                            ),
+                            shape = RoundedCornerShape(24.dp)
+                        ) {
+                            Text(
+                                text = "Нет",
+                                style = CardioTheme.typography.navLabel,
+                                color = CardioTheme.colors.textMain
+                            )
+                        }
+
+                        TextButton(
+                            modifier = Modifier
+                                .wrapContentWidth()
+                                .height(56.dp),
+                            onClick = {
+                                showCancelDialog = false
+                                onCheckedChange(false)
+                            },
+                            shape = RoundedCornerShape(24.dp),
+                            colors = ButtonDefaults.textButtonColors(
+                                containerColor = CardioTheme.colors.cardVitamins,
+                                contentColor = CardioTheme.colors.onPrimary
+                            )
+                        ) {
+                            Text(
+                                text = "Отменить",
+                                style = CardioTheme.typography.navLabel,
+                                color = CardioTheme.colors.textMain,
+                            )
+                        }
                     }
                 }
-            },
-            containerColor = CardioTheme.colors.onPrimary,
-            shape = RoundedCornerShape(36.dp)
-        )
+            }
+        }
     }
 }

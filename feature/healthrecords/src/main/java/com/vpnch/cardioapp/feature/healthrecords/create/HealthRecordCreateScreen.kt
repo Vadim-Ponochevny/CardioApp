@@ -24,17 +24,28 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.vpnch.cardioapp.core.ui.CardioPreview
 import com.vpnch.cardioapp.core.ui.R
 import com.vpnch.cardioapp.core.ui.theme.CardioTheme
+import com.vpnch.cardioapp.feature.healthrecords.HealthMetricKind
+import com.vpnch.cardioapp.feature.healthrecords.components.MetricInstructionText
 import com.vpnch.cardioapp.feature.healthrecords.components.MetricLimitsFooter
+import com.vpnch.cardioapp.feature.healthrecords.measurementInstruction
 import com.vpnch.cardioapp.feature.healthrecords.create.components.MetricInputField
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -133,33 +144,34 @@ private fun HealthRecordCreatePageContent(
             0 -> BloodPressurePage(
                 systolic = uiState.systolicInput,
                 diastolic = uiState.diastolicInput,
-                expectedRangeLabel = uiState.expectedRangeLabel,
-                showWarning = uiState.bloodPressureWarning != null,
+                systolicPlaceholder = uiState.systolicPlaceholder,
+                diastolicPlaceholder = uiState.diastolicPlaceholder,
+                warning = uiState.bloodPressureWarning,
                 onSystolicChange = onSystolicChange,
                 onDiastolicChange = onDiastolicChange,
             )
 
             1 -> SingleMetricPage(
                 value = uiState.respiratoryInput,
-                label = "22",
-                expectedRangeLabel = uiState.expectedRangeLabel,
-                showWarning = uiState.respiratoryWarning != null,
+                placeholder = uiState.metricPlaceholder,
+                instruction = HealthMetricKind.RespiratoryRate.measurementInstruction,
+                warning = uiState.respiratoryWarning,
                 onValueChange = onRespiratoryChange,
             )
 
             2 -> SingleMetricPage(
                 value = uiState.heartRateInput,
-                label = "70",
-                expectedRangeLabel = uiState.expectedRangeLabel,
-                showWarning = uiState.heartRateWarning != null,
+                placeholder = uiState.metricPlaceholder,
+                instruction = HealthMetricKind.HeartRate.measurementInstruction,
+                warning = uiState.heartRateWarning,
                 onValueChange = onHeartRateChange,
             )
 
             3 -> SingleMetricPage(
                 value = uiState.oxygenInput,
-                label = "95",
-                expectedRangeLabel = uiState.expectedRangeLabel,
-                showWarning = uiState.oxygenWarning != null,
+                placeholder = uiState.metricPlaceholder,
+                instruction = HealthMetricKind.OxygenSaturation.measurementInstruction,
+                warning = uiState.oxygenWarning,
                 onValueChange = onOxygenChange,
             )
         }
@@ -227,24 +239,32 @@ private fun HealthRecordCreateBottomBar(
 private fun BloodPressurePage(
     systolic: String,
     diastolic: String,
-    expectedRangeLabel: String?,
-    showWarning: Boolean,
+    systolicPlaceholder: String,
+    diastolicPlaceholder: String,
+    warning: FieldWarning?,
     onSystolicChange: (String) -> Unit,
     onDiastolicChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var warningVisible by remember { mutableStateOf(false) }
+    val diastolicFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(systolic, diastolic) {
+        warningVisible = false
+    }
+
+    fun submitBloodPressure() {
+        if (systolic.isNotBlank() && diastolic.isNotBlank()) {
+            warningVisible = warning != null
+        }
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(top = 24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-//        Text(
-//            modifier = Modifier.padding(bottom = 24.dp),
-//            text = "Запиши цифры сюда!",
-//            style = CardioTheme.typography.bodyLarge,
-//            color = CardioTheme.colors.textMain,
-//        )
         Text(
             text = "Верхнее",
             style = CardioTheme.typography.bodyMedium,
@@ -253,7 +273,9 @@ private fun BloodPressurePage(
         MetricInputField(
             value = systolic,
             onValueChange = onSystolicChange,
-            label = "110",
+            label = systolicPlaceholder,
+            imeAction = ImeAction.Next,
+            onImeAction = { diastolicFocusRequester.requestFocus() },
         )
         Text(
             text = "Нижнее",
@@ -261,13 +283,15 @@ private fun BloodPressurePage(
             color = CardioTheme.colors.textMain,
         )
         MetricInputField(
+            modifier = Modifier.focusRequester(diastolicFocusRequester),
             value = diastolic,
             onValueChange = onDiastolicChange,
-            label = "70",
+            label = diastolicPlaceholder,
+            onImeAction = ::submitBloodPressure,
         )
         MetricLimitsFooter(
-            expectedRangeLabel = expectedRangeLabel,
-            showWarning = showWarning,
+            showWarning = warningVisible,
+            warning = warning,
             modifier = Modifier.padding(top = 8.dp),
         )
     }
@@ -276,33 +300,41 @@ private fun BloodPressurePage(
 @Composable
 private fun SingleMetricPage(
     value: String,
-    label: String,
-    expectedRangeLabel: String?,
-    showWarning: Boolean,
+    placeholder: String,
+    instruction: String?,
+    warning: FieldWarning?,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var warningVisible by remember { mutableStateOf(false) }
+    LaunchedEffect(value) {
+        warningVisible = false
+    }
+
+    fun submitValue() {
+        if (value.isNotBlank()) {
+            warningVisible = warning != null
+        }
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(top = 24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        if (value == "oxygenInput") {
-            Text(
-                text = "Сколько вдохов в минуту?",
-                style = CardioTheme.typography.bodyLarge,
-            )
-        }
-
         MetricInputField(
             value = value,
             onValueChange = onValueChange,
-            label = label,
+            label = placeholder,
+            onImeAction = ::submitValue,
         )
+        if (instruction != null) {
+            MetricInstructionText(text = instruction)
+        }
         MetricLimitsFooter(
-            expectedRangeLabel = expectedRangeLabel,
-            showWarning = showWarning,
+            showWarning = warningVisible,
+            warning = warning,
         )
     }
 }
@@ -315,8 +347,9 @@ private fun HealthRecordCreateScreenPreview() {
             currentPage = 0,
             systolicInput = "120",
             diastolicInput = "80",
-            expectedRangeLabel = "Ожидается от 110/70 до 125/85",
-            bloodPressureWarning = FieldWarning,
+            systolicPlaceholder = "117",
+            diastolicPlaceholder = "77",
+            bloodPressureWarning = FieldWarning.Critical,
             canProceed = true,
         ),
         onBack = {},

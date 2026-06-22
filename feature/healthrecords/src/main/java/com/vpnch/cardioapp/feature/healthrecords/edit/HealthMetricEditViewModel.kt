@@ -11,7 +11,9 @@ import com.vpnch.cardioapp.core.model.HealthRecord
 import com.vpnch.cardioapp.core.model.MetricStatus
 import com.vpnch.cardioapp.core.model.MetricType
 import com.vpnch.cardioapp.core.model.SingleMetricLimits
-import com.vpnch.cardioapp.core.model.expectedRangeLabel
+import com.vpnch.cardioapp.core.model.normalDiastolicPlaceholder
+import com.vpnch.cardioapp.core.model.normalPlaceholder
+import com.vpnch.cardioapp.core.model.normalSystolicPlaceholder
 import com.vpnch.cardioapp.feature.healthrecords.HealthMetricKind
 import com.vpnch.cardioapp.feature.healthrecords.create.FieldWarning
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -141,16 +143,16 @@ class HealthMetricEditViewModel @Inject constructor(
             singleInput.toPositiveInt() != null
         }
 
-        val expectedRangeLabel = if (isBloodPressure) {
-            bloodPressureLimits?.expectedRangeLabel()
-        } else {
-            singleLimits[metricKind.toMetricType()]?.expectedRangeLabel()
-        }
-
         return copy(
             bloodPressureWarning = bloodPressureWarning,
             singleWarning = singleWarning,
-            expectedRangeLabel = expectedRangeLabel,
+            systolicPlaceholder = bloodPressureLimits?.normalSystolicPlaceholder().orEmpty(),
+            diastolicPlaceholder = bloodPressureLimits?.normalDiastolicPlaceholder().orEmpty(),
+            singlePlaceholder = if (isBloodPressure) {
+                ""
+            } else {
+                singleLimits[metricKind.toMetricType()]?.normalPlaceholder().orEmpty()
+            },
             canSave = canSave,
         )
     }
@@ -172,7 +174,8 @@ class HealthMetricEditViewModel @Inject constructor(
     private fun warningForStatus(status: MetricStatus): FieldWarning? {
         return when (status) {
             MetricStatus.Normal, MetricStatus.Unknown -> null
-            MetricStatus.Attention, MetricStatus.DoctorSoon -> FieldWarning
+            MetricStatus.Attention -> FieldWarning.Attention
+            MetricStatus.DoctorSoon -> FieldWarning.Critical
         }
     }
 
@@ -193,7 +196,9 @@ data class HealthMetricEditUiState(
     val singleLabel: String = "",
     val bloodPressureWarning: FieldWarning? = null,
     val singleWarning: FieldWarning? = null,
-    val expectedRangeLabel: String? = null,
+    val systolicPlaceholder: String = "",
+    val diastolicPlaceholder: String = "",
+    val singlePlaceholder: String = "",
     val isSaving: Boolean = false,
     val canSave: Boolean = false,
     val loadError: Boolean = false,
@@ -231,21 +236,21 @@ private fun HealthRecord.toEditUiState(kind: HealthMetricKind): HealthMetricEdit
             metricKind = kind,
             title = kind.title,
             singleInput = respiratoryRate?.toString().orEmpty(),
-            singleLabel = "Вдохов в минуту",
+            singleLabel = "22",
         )
 
         HealthMetricKind.HeartRate -> HealthMetricEditUiState(
             metricKind = kind,
             title = kind.title,
             singleInput = heartRate?.toString().orEmpty(),
-            singleLabel = "Ударов в минуту",
+            singleLabel = "70",
         )
 
         HealthMetricKind.OxygenSaturation -> HealthMetricEditUiState(
             metricKind = kind,
             title = kind.title,
             singleInput = oxygenSaturation?.toString().orEmpty(),
-            singleLabel = "SpO2, %",
+            singleLabel = "95",
         )
     }
 }

@@ -16,6 +16,7 @@ data class LatestHealthRecordSummary(
     val timeLabel: String,
     val metrics: List<TodayMetricItem>,
     val hasOutOfNorm: Boolean,
+    val hasCritical: Boolean,
 )
 
 data class TodayMetricItem(

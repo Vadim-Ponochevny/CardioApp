@@ -5,8 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.vpnch.cardioapp.core.domain.HealthRecordRepository
 import com.vpnch.cardioapp.core.domain.PatientRepository
 import com.vpnch.cardioapp.core.domain.VitaminRepository
-import com.vpnch.cardioapp.core.model.currentDateKey
-import com.vpnch.cardioapp.core.model.formatDaySectionLabel
+import com.vpnch.cardioapp.core.model.formatDayMonthLabel
 import com.vpnch.cardioapp.core.model.formatRecordsCount
 import com.vpnch.cardioapp.core.model.timestampToDateKey
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,7 +24,6 @@ class HistoryViewModel @Inject constructor(
     vitaminRepository: VitaminRepository,
 ) : ViewModel() {
 
-    private val referenceDateKey = currentDateKey()
     private val patient = patientRepository.observeCurrentPatient()
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -39,8 +37,8 @@ class HistoryViewModel @Inject constructor(
             ) { records, takenVitamins ->
                 HistoryUiState(
                     isLoading = false,
-                    healthRecordSections = records.toHealthRecordSections(referenceDateKey),
-                    vitaminSections = takenVitamins.toVitaminSections(referenceDateKey),
+                    healthRecordSections = records.toHealthRecordSections(),
+                    vitaminSections = takenVitamins.toVitaminSections(),
                 )
             }
         }
@@ -75,13 +73,12 @@ data class VitaminHistoryItem(
 )
 
 private fun List<com.vpnch.cardioapp.core.model.HealthRecord>.toHealthRecordSections(
-    referenceDateKey: String,
 ): List<HealthRecordHistorySection> {
     return groupBy { timestampToDateKey(it.createdAt) }
         .map { (dateKey, records) ->
             HealthRecordHistorySection(
                 dateKey = dateKey,
-                label = formatDaySectionLabel(dateKey, referenceDateKey),
+                label = formatDayMonthLabel(dateKey),
                 recordsCountLabel = formatRecordsCount(records.size),
             )
         }
@@ -89,13 +86,12 @@ private fun List<com.vpnch.cardioapp.core.model.HealthRecord>.toHealthRecordSect
 }
 
 private fun List<com.vpnch.cardioapp.core.model.TakenVitaminOnDate>.toVitaminSections(
-    referenceDateKey: String,
 ): List<VitaminHistorySection> {
     return groupBy { it.date }
         .map { (dateKey, items) ->
             VitaminHistorySection(
                 dateKey = dateKey,
-                label = formatDaySectionLabel(dateKey, referenceDateKey),
+                label = formatDayMonthLabel(dateKey),
                 vitamins = items.map { VitaminHistoryItem(it.vitaminId, it.vitaminName) },
             )
         }

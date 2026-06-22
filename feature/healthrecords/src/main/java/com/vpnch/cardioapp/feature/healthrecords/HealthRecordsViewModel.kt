@@ -87,12 +87,13 @@ class HealthRecordsViewModel @Inject constructor(
         record: HealthRecord,
         limits: MetricLimitsBundle?,
     ): HealthRecordListItem {
-        val hasOutOfNorm = limits?.let { bundle ->
-            evaluateLimits.evaluate(record, bundle.singleLimits, bundle.bloodPressureLimits).hasOutOfNorm
-        } ?: false
+        val evaluation = limits?.let { bundle ->
+            evaluateLimits.evaluate(record, bundle.singleLimits, bundle.bloodPressureLimits)
+        }
         return HealthRecordListItem(
             record = record,
-            hasOutOfNorm = hasOutOfNorm,
+            hasOutOfNorm = evaluation?.hasOutOfNorm == true,
+            hasCritical = evaluation?.hasDoctorSoon == true,
         )
     }
 
@@ -111,6 +112,7 @@ data class HealthRecordsUiState(
 data class HealthRecordListItem(
     val record: HealthRecord,
     val hasOutOfNorm: Boolean,
+    val hasCritical: Boolean = false,
 )
 
 sealed interface HealthRecordsEvent {

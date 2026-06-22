@@ -162,6 +162,7 @@ private fun TodayScreenPreviewContent() {
                 recordId = "record-1",
                 timeLabel = "17:00",
                 hasOutOfNorm = true,
+                hasCritical = true,
                 metrics = listOf(
                     TodayMetricItem("Давление", "110/80", TodayMetricIcons.BLOOD_PRESSURE, false),
                     TodayMetricItem("Дыхание", "18", TodayMetricIcons.RESPIRATORY, false),

@@ -8,20 +8,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.vpnch.cardioapp.core.ui.theme.CardioTheme
@@ -32,16 +33,17 @@ fun MetricInputField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
+    imeAction: ImeAction = ImeAction.Done,
+    onImeAction: (() -> Unit)? = null,
 ) {
     var isFocused by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
     val isEmpty = value.isEmpty()
 
-    // Определяем состояния поля
-    val isActive = isFocused // Активное (в фокусе)
-    val isFilled = !isEmpty && !isFocused // Заполненное (не в фокусе и есть значение)
-    val isEmptyState = isEmpty && !isFocused // Пустое (нет значения и не в фокусе)
+    val isActive = isFocused
+    val isFilled = !isEmpty && !isFocused
 
-    // Определяем цвета stroke и текста
     val strokeColor = when {
         isActive -> CardioTheme.colors.textMain
         isFilled -> CardioTheme.colors.textDisabled
@@ -62,10 +64,9 @@ fun MetricInputField(
                 .border(
                     width = 4.dp,
                     color = strokeColor,
-                    shape = RoundedCornerShape(36.dp)
+                    shape = RoundedCornerShape(36.dp),
                 ),
-//                .padding(horizontal = 16.dp, vertical = 12.dp),
-            contentAlignment = Alignment.CenterStart
+            contentAlignment = Alignment.CenterStart,
         ) {
             BasicTextField(
                 value = value,
@@ -76,10 +77,23 @@ fun MetricInputField(
                     .onFocusChanged { focusState ->
                         isFocused = focusState.isFocused
                     },
-                textStyle = CardioTheme.typography.inputValue.copy( // Копируем стиль и меняем цвет
-                    color = textColor
+                textStyle = CardioTheme.typography.inputValue.copy(
+                    color = textColor,
                 ),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = imeAction,
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        focusManager.clearFocus()
+                        keyboardController?.hide()
+                        onImeAction?.invoke()
+                    },
+                    onNext = {
+                        onImeAction?.invoke()
+                    },
+                ),
                 singleLine = true,
                 cursorBrush = SolidColor(CardioTheme.colors.textMain),
                 decorationBox = { innerTextField ->
@@ -87,12 +101,12 @@ fun MetricInputField(
                         Text(
                             text = label,
                             style = CardioTheme.typography.inputValue.copy(
-                                color = CardioTheme.colors.textDisabled
-                            )
+                                color = CardioTheme.colors.textDisabled,
+                            ),
                         )
                     }
                     innerTextField()
-                }
+                },
             )
         }
     }

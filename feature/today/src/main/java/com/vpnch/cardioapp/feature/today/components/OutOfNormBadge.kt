@@ -14,13 +14,20 @@ import com.vpnch.cardioapp.core.ui.theme.CardioTheme
 
 @Composable
 fun OutOfNormBadge(
+    isCritical: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
             .size(36.dp)
             .clip(CircleShape)
-            .background(CardioTheme.colors.warningContainer),
+            .background(
+                if (isCritical) {
+                    CardioTheme.colors.cardSurvey
+                } else {
+                    CardioTheme.colors.warningContainer
+                },
+            ),
         contentAlignment = Alignment.Center,
     ) {
         Text(

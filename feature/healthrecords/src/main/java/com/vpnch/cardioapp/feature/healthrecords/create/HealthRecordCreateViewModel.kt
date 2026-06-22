@@ -12,7 +12,9 @@ import com.vpnch.cardioapp.core.model.HealthRecord
 import com.vpnch.cardioapp.core.model.MetricStatus
 import com.vpnch.cardioapp.core.model.MetricType
 import com.vpnch.cardioapp.core.model.SingleMetricLimits
-import com.vpnch.cardioapp.core.model.expectedRangeLabel
+import com.vpnch.cardioapp.core.model.normalDiastolicPlaceholder
+import com.vpnch.cardioapp.core.model.normalPlaceholder
+import com.vpnch.cardioapp.core.model.normalSystolicPlaceholder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicBoolean
@@ -260,7 +262,9 @@ class HealthRecordCreateViewModel @Inject constructor(
             respiratoryWarning = respiratoryWarning,
             heartRateWarning = heartRateWarning,
             oxygenWarning = oxygenWarning,
-            expectedRangeLabel = expectedRangeLabelForPage(currentPage),
+            systolicPlaceholder = bloodPressureLimits?.normalSystolicPlaceholder().orEmpty(),
+            diastolicPlaceholder = bloodPressureLimits?.normalDiastolicPlaceholder().orEmpty(),
+            metricPlaceholder = metricPlaceholderForPage(currentPage),
             canProceed = canProceed,
             primaryButtonLabel = primaryButtonLabel,
         )
@@ -289,17 +293,17 @@ class HealthRecordCreateViewModel @Inject constructor(
     private fun warningForStatus(status: MetricStatus): FieldWarning? {
         return when (status) {
             MetricStatus.Normal, MetricStatus.Unknown -> null
-            MetricStatus.Attention, MetricStatus.DoctorSoon -> FieldWarning
+            MetricStatus.Attention -> FieldWarning.Attention
+            MetricStatus.DoctorSoon -> FieldWarning.Critical
         }
     }
 
-    private fun expectedRangeLabelForPage(page: Int): String? {
+    private fun metricPlaceholderForPage(page: Int): String {
         return when (page) {
-            0 -> bloodPressureLimits?.expectedRangeLabel()
-            1 -> singleLimits[MetricType.RespiratoryRate]?.expectedRangeLabel()
-            2 -> singleLimits[MetricType.HeartRate]?.expectedRangeLabel()
-            3 -> singleLimits[MetricType.OxygenSaturation]?.expectedRangeLabel()
-            else -> null
+            1 -> singleLimits[MetricType.RespiratoryRate]?.normalPlaceholder().orEmpty()
+            2 -> singleLimits[MetricType.HeartRate]?.normalPlaceholder().orEmpty()
+            3 -> singleLimits[MetricType.OxygenSaturation]?.normalPlaceholder().orEmpty()
+            else -> ""
         }
     }
 

@@ -1,6 +1,5 @@
 package com.vpnch.cardioapp.feature.healthrecords.components
 
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,51 +17,43 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.vpnch.cardioapp.core.ui.CardioPreview
 import com.vpnch.cardioapp.core.ui.theme.CardioTheme
+import com.vpnch.cardioapp.feature.healthrecords.create.FieldWarning
+import com.vpnch.cardioapp.feature.healthrecords.create.isCritical
 
 private const val LIMIT_WARNING_MESSAGE =
     "Если замер не попал в эти ожидания — позвони доктору и он расскажет что делать."
 
 @Composable
 fun MetricLimitsFooter(
-    expectedRangeLabel: String?,
-    showWarning: Boolean,
     modifier: Modifier = Modifier,
+    showWarning: Boolean,
+    warning: FieldWarning? = null,
 ) {
-    if (expectedRangeLabel == null && !showWarning) return
+    if (!showWarning) return
 
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        if (expectedRangeLabel != null) {
-            Text(
-                text = expectedRangeLabel,
-                style = CardioTheme.typography.bodySmall,
-                color = CardioTheme.colors.textSecondary,
-            )
-        }
-        if (showWarning) {
-            MetricLimitWarningCard()
-        }
-    }
+    MetricLimitWarningCard(
+        isCritical = warning?.isCritical == true,
+        modifier = modifier,
+    )
 }
 
 @Composable
 private fun MetricLimitWarningCard(
+    isCritical: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = CardioTheme.colors.warningContainer,
+            containerColor = CardioTheme.colors.onPrimary,
         ),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
-                .verticalScroll(rememberScrollState()), // Добавляем вертикальный скролл
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Row(
@@ -70,14 +61,13 @@ private fun MetricLimitWarningCard(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                MetricAlertBadge()
+                MetricAlertBadge(isCritical = isCritical)
                 Text(
                     text = LIMIT_WARNING_MESSAGE,
                     style = CardioTheme.typography.bodySmall,
                     color = CardioTheme.colors.textMain,
                 )
             }
-
         }
     }
 }
@@ -86,7 +76,7 @@ private fun MetricLimitWarningCard(
 @Composable
 private fun MetricLimitsFooterPreview() {
     MetricLimitsFooter(
-        expectedRangeLabel = "Ожидается от 110/70 до 125/85",
         showWarning = true,
+        warning = FieldWarning.Critical,
     )
 }

@@ -12,6 +12,17 @@ object SeedData {
 
     val singleMetricLimits = listOf(
         SingleMetricLimitEntity(
+            id = "age-10-11-respiratory",
+            ageGroup = "Age10To11",
+            metricType = "RespiratoryRate",
+            normalMin = 18,
+            normalMax = 24,
+            attentionMin = 12,
+            attentionMax = 18,
+            doctorSoonMin = null,
+            doctorSoonMax = 12,
+        ),
+        SingleMetricLimitEntity(
             id = "age-10-11-heart-rate",
             ageGroup = "Age10To11",
             metricType = "HeartRate",
@@ -58,7 +69,7 @@ object SeedData {
     val surveyLink = SurveyLinkEntity(
         id = "default-survey",
         title = "Ежемесячный опрос",
-        url = "https://forms.yandex.ru/",
+        url = "https://forms.yandex.ru/u/6a2abbf095add53c1f78ef01/",
         isActive = true,
         createdAt = 0L,
         updatedAt = 0L,

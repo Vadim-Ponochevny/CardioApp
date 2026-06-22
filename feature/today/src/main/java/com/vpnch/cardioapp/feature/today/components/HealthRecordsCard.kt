@@ -58,7 +58,7 @@ fun HealthRecordsCard(
                         color = CardioTheme.colors.textMain,
                     )
                     if (latestRecord?.hasOutOfNorm == true) {
-                        OutOfNormBadge()
+                        OutOfNormBadge(isCritical = latestRecord.hasCritical)
                     }
                 }
                 if (latestRecord != null) {

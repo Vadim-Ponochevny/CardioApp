@@ -10,6 +10,7 @@ import com.vpnch.cardioapp.core.domain.PatientRepository
 import com.vpnch.cardioapp.core.model.HealthRecord
 import com.vpnch.cardioapp.core.model.formatAsHealthMetric
 import com.vpnch.cardioapp.core.model.formatBloodPressure
+import com.vpnch.cardioapp.core.model.MetricStatus
 import com.vpnch.cardioapp.core.model.isOutOfNorm
 import com.vpnch.cardioapp.feature.healthrecords.HealthMetricKind
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -82,6 +83,7 @@ data class MetricItem(
     val title: String,
     val value: String,
     val isOutOfNorm: Boolean,
+    val isCritical: Boolean = false,
 )
 
 private fun HealthRecord.toMetricItems(
@@ -98,24 +100,28 @@ private fun HealthRecord.toMetricItems(
             title = "Давление",
             value = formatBloodPressure(systolicPressure, diastolicPressure),
             isOutOfNorm = evaluation?.bloodPressure.isOutOfNorm(),
+            isCritical = evaluation?.bloodPressure == MetricStatus.DoctorSoon,
         ),
         MetricItem(
             kind = HealthMetricKind.RespiratoryRate,
             title = "Дыхание",
             value = respiratoryRate.formatAsHealthMetric(),
             isOutOfNorm = evaluation?.respiratoryRate.isOutOfNorm(),
+            isCritical = evaluation?.respiratoryRate == MetricStatus.DoctorSoon,
         ),
         MetricItem(
             kind = HealthMetricKind.HeartRate,
             title = "Пульс",
             value = heartRate.formatAsHealthMetric(),
             isOutOfNorm = evaluation?.heartRate.isOutOfNorm(),
+            isCritical = evaluation?.heartRate == MetricStatus.DoctorSoon,
         ),
         MetricItem(
             kind = HealthMetricKind.OxygenSaturation,
             title = "Кислород",
             value = oxygenSaturation.formatAsHealthMetric(),
             isOutOfNorm = evaluation?.oxygenSaturation.isOutOfNorm(),
+            isCritical = evaluation?.oxygenSaturation == MetricStatus.DoctorSoon,
         ),
     )
 }

@@ -15,18 +15,25 @@ import com.vpnch.cardioapp.core.ui.theme.CardioTheme
 
 @Composable
 fun MetricAlertBadge(
+    isCritical: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
-            .size(20.dp)
+            .size(36.dp)
             .clip(CircleShape)
-            .background(CardioTheme.colors.cardSurvey),
+            .background(
+                if (isCritical) {
+                    CardioTheme.colors.cardSurvey
+                } else {
+                    CardioTheme.colors.warningContainer
+                },
+            ),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             text = "!",
-            color = CardioTheme.colors.onPrimary,
+            color = CardioTheme.colors.textMain,
             style = CardioTheme.typography.navLabel,
         )
     }

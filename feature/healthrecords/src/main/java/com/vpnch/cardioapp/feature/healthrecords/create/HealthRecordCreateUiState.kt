@@ -7,7 +7,13 @@ enum class HealthRecordCreatePage(val title: String) {
     OxygenSaturation("Кислород"),
 }
 
-data object FieldWarning
+enum class FieldWarning {
+    Attention,
+    Critical,
+}
+
+val FieldWarning.isCritical: Boolean
+    get() = this == FieldWarning.Critical
 
 data class HealthRecordCreateUiState(
     val currentPage: Int = 0,
@@ -20,7 +26,9 @@ data class HealthRecordCreateUiState(
     val respiratoryWarning: FieldWarning? = null,
     val heartRateWarning: FieldWarning? = null,
     val oxygenWarning: FieldWarning? = null,
-    val expectedRangeLabel: String? = null,
+    val systolicPlaceholder: String = "",
+    val diastolicPlaceholder: String = "",
+    val metricPlaceholder: String = "",
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
     val savedWithDoctorAlert: Boolean = false,

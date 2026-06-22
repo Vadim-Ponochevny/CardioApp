@@ -127,6 +127,7 @@ private fun HealthRecord.toSummary(
             ),
         ),
         hasOutOfNorm = evaluation?.hasOutOfNorm == true,
+        hasCritical = evaluation?.hasDoctorSoon == true,
     )
 }
 
