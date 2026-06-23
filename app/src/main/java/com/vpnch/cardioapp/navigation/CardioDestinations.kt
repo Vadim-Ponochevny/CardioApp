@@ -18,10 +18,10 @@ object CardioDestinations {
     const val VITAMINS = "vitamins"
     const val HISTORY = "history"
     const val HELP = "help"
-    const val SURVEY = "survey?url={url}"
-    const val SURVEY_URL_ARG = "url"
-
-    fun survey(url: String): String = "survey?url=${android.net.Uri.encode(url)}"
+//    const val SURVEY = "survey?url={url}"
+//    const val SURVEY_URL_ARG = "url"
+//
+//    fun survey(url: String): String = "survey?url=${android.net.Uri.encode(url)}"
 
     fun healthRecordCreate(recordId: String? = null): String {
         return if (recordId == null) {
@@ -49,9 +49,9 @@ object CardioDestinations {
 enum class TopLevelDestination(
     val route: String,
     val label: String,
-    @DrawableRes val iconRes: Int // Теперь здесь хранится ссылка на XML/SVG иконку
+    @DrawableRes val iconRes: Int
 ) {
-    TODAY(CardioDestinations.TODAY_GRAPH, "Сегодня", R.drawable.home),
-    HISTORY(CardioDestinations.HISTORY, "История", R.drawable.history),
-    HELP(CardioDestinations.HELP, "Помощь", R.drawable.help)
+    TODAY(CardioDestinations.TODAY_GRAPH, "Сегодня", R.drawable.ic_home),
+    HISTORY(CardioDestinations.HISTORY, "История", R.drawable.ic_history),
+    HELP(CardioDestinations.HELP, "Помощь", R.drawable.ic_help)
 }

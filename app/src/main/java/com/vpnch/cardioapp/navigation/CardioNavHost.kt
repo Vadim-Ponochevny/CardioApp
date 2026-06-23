@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -25,6 +26,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.vpnch.cardioapp.core.ui.CardioDimens
 import com.vpnch.cardioapp.feature.healthrecords.HealthRecordsRoute
 import com.vpnch.cardioapp.feature.healthrecords.create.HealthRecordCreateRoute
 import com.vpnch.cardioapp.feature.healthrecords.detail.HealthRecordDetailRoute
@@ -34,6 +36,7 @@ import com.vpnch.cardioapp.feature.history.HistoryRoute
 import com.vpnch.cardioapp.feature.today.TodayRoute
 import com.vpnch.cardioapp.feature.vitamins.VitaminsRoute
 import com.vpnch.cardioapp.core.ui.theme.CardioTheme
+import com.vpnch.cardioapp.navigation.CardioDestinations.HEALTH_RECORD_DETAIL_ARG
 
 @Composable
 fun CardioNavHost(
@@ -48,7 +51,7 @@ fun CardioNavHost(
 
     Scaffold(
         modifier = modifier,
-        containerColor = Color(0xFFF6F6F6),
+        containerColor = CardioTheme.colors.background,
         bottomBar = {
             if (showBottomBar) {
                 NavigationBar(
@@ -64,16 +67,16 @@ fun CardioNavHost(
                                 Icon(
                                     painter = painterResource(id = destination.iconRes),
                                     contentDescription = destination.label,
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(CardioDimens.NavigationBar.navigationBarItemSize),
                                 )
                             },
                             label = { Text(destination.label) },
                             colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = CardioTheme.colors.primary,      // цвет иконки когда выбрана
-                                unselectedIconColor = CardioTheme.colors.textSecondary, // цвет иконки когда не выбрана
-                                selectedTextColor = CardioTheme.colors.primary,      // цвет текста когда выбран
-                                unselectedTextColor = CardioTheme.colors.textSecondary, // цвет текста когда не выбран
-                                indicatorColor = CardioTheme.colors.navSelectedContainer // цвет индикатора выбора
+                                selectedIconColor = CardioTheme.colors.primary,
+                                unselectedIconColor = CardioTheme.colors.textSecondary,
+                                selectedTextColor = CardioTheme.colors.primary,
+                                unselectedTextColor = CardioTheme.colors.textSecondary,
+                                indicatorColor = CardioTheme.colors.navSelectedContainer,
                             )
                         )
                     }
@@ -86,24 +89,16 @@ fun CardioNavHost(
             startDestination = CardioDestinations.TODAY_GRAPH,
             modifier = Modifier.padding(innerPadding),
         ) {
-            navigation(
-                route = CardioDestinations.TODAY_GRAPH,
-                startDestination = CardioDestinations.TODAY_HOME,
-            ) {
-                composable(route = CardioDestinations.TODAY_HOME) {
-                    TodayRoute(
-                        onOpenLatestRecord = { recordId ->
-                            navController.navigate(CardioDestinations.healthRecordDetail(recordId))
-                        },
-                        onAddHealthRecord = {
-                            navController.navigate(CardioDestinations.healthRecordCreate())
-                        },
-                        onOpenSurvey = {},
-                    )
-                }
-                composable(route = CardioDestinations.VITAMINS) {
-                    VitaminsRoute()
-                }
+
+            composable(route = CardioDestinations.TODAY_HOME) {
+                TodayRoute(
+                    onOpenLatestRecord = { recordId ->
+                        navController.navigate(CardioDestinations.healthRecordDetail(recordId))
+                    },
+                    onAddHealthRecord = {
+                        navController.navigate(CardioDestinations.healthRecordCreate())
+                    },
+                )
             }
 
             composable(CardioDestinations.HISTORY) {
@@ -139,15 +134,12 @@ fun CardioNavHost(
                         type = NavType.StringType
                     },
                 ),
-            ) {
+            ) { backStackEntry ->
+                val recordId = backStackEntry.arguments?.getString(HEALTH_RECORD_DETAIL_ARG).orEmpty()
                 HealthRecordDetailRoute(
                     onBack = { navController.popBackStack() },
                     onEditMetric = { metricType ->
-                        val recordId = navController.currentBackStackEntry
-                            ?.arguments
-                            ?.getString(CardioDestinations.HEALTH_RECORD_DETAIL_ARG)
-                            .orEmpty()
-                        navController.navigate(
+                        navController.safeNavigate(
                             CardioDestinations.healthMetricEdit(recordId, metricType),
                         )
                     },
@@ -208,6 +200,12 @@ private fun NavDestination?.showsBottomBar(): Boolean {
     return route == CardioDestinations.TODAY_HOME ||
         route == CardioDestinations.HISTORY ||
         route == CardioDestinations.HELP
+}
+
+fun NavController.safeNavigate(route: String) {
+    if (currentBackStackEntry?.destination?.route != route) {
+        navigate(route) { launchSingleTop = true }
+    }
 }
 
 private fun NavDestination?.topLevelDestination(): TopLevelDestination? {

@@ -10,7 +10,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 fun TodayRoute(
     onOpenLatestRecord: (String) -> Unit,
     onAddHealthRecord: () -> Unit,
-    onOpenSurvey: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val viewModel: TodayViewModel = hiltViewModel()

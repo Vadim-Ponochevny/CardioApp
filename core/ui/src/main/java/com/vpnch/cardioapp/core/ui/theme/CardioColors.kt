@@ -1,5 +1,6 @@
 package com.vpnch.cardioapp.core.ui.theme
 
+import androidx.compose.foundation.background
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Immutable
@@ -19,6 +20,7 @@ data class CardioColors(
     val primaryDark: Color,
     val warningContainer: Color,
     val actionCall: Color,
+    val background: Color,
 )
 
 private fun cardioColor(hex: String): Color {
@@ -39,6 +41,7 @@ val DefaultCardioColors = CardioColors(
     primaryDark = cardioColor("#034C7F"),
     warningContainer = cardioColor("#FFF06C"),
     actionCall = cardioColor("#ADEF74"),
+    background = cardioColor("F6F6F6"),
 )
 
 /**
