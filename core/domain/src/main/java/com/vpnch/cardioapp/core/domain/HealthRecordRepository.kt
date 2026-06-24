@@ -26,4 +26,8 @@ interface HealthRecordRepository {
     suspend fun getSingleMetricLimits(ageGroup: AgeGroup): List<SingleMetricLimits>
 
     suspend fun getBloodPressureLimits(ageGroup: AgeGroup): BloodPressureLimits?
+
+    suspend fun upsertSingleMetricLimits(limits: List<SingleMetricLimits>)
+
+    suspend fun upsertBloodPressureLimits(limits: List<BloodPressureLimits>)
 }

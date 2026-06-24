@@ -8,11 +8,11 @@ class DatabaseSeeder @Inject constructor(
     private val database: CardioDatabase,
 ) {
     suspend fun seedIfNeeded() {
-        if (database.vitaminDao().getVitamin(SeedData.vitamins.first().id) != null) return
+        // Guard: check if new multi-age-group seed was already applied
+        if (database.healthRecordDao().getSingleMetricLimitById("age-3-5-respiratory") != null) return
 
         database.healthRecordDao().upsertSingleMetricLimits(SeedData.singleMetricLimits)
         database.healthRecordDao().upsertBloodPressureLimits(SeedData.bloodPressureLimits)
-        SeedData.vitamins.forEach { database.vitaminDao().upsertVitamin(it) }
         database.surveyDao().upsertSurveyLink(SeedData.surveyLink)
         database.helpDao().upsertHelpContacts(SeedData.helpContacts)
         database.helpDao().upsertFaqs(SeedData.faqs)

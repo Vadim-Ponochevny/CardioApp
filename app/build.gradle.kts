@@ -49,6 +49,8 @@ dependencies {
     implementation(project(":feature:vitamins"))
     implementation(project(":feature:history"))
     implementation(project(":feature:help"))
+    implementation(project(":feature:profile"))
+    implementation(project(":feature:onboarding"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

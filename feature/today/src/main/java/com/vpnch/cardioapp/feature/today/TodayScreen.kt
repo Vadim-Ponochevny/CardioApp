@@ -17,6 +17,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -45,6 +46,7 @@ fun TodayScreen(
     uiState: TodayUiState,
     onOpenLatestRecord: (String) -> Unit,
     onAddHealthRecord: () -> Unit,
+    onOpenProfile: () -> Unit,
     onOpenSurvey: (SurveyLink) -> Unit,
     onVitaminCheckedChange: (VitaminIntakeSummary, Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -68,17 +70,31 @@ fun TodayScreen(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Column {
-            Text(
-                text = "Сегодня",
-                style = CardioTheme.typography.screenTitle,
-                color = CardioTheme.colors.textMain,
-            )
-            Text(
-                text = getFormattedDate(),
-                style = CardioTheme.typography.bodySmall,
-                color = CardioTheme.colors.textSecondary,
-            )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top,
+        ) {
+            Column {
+                Text(
+                    text = "Сегодня",
+                    style = CardioTheme.typography.screenTitle,
+                    color = CardioTheme.colors.textMain,
+                )
+                Text(
+                    text = getFormattedDate(),
+                    style = CardioTheme.typography.bodySmall,
+                    color = CardioTheme.colors.textSecondary,
+                )
+            }
+            IconButton(onClick = onOpenProfile) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_profile),
+                    contentDescription = "Профиль",
+                    modifier = Modifier.size(28.dp),
+                    tint = CardioTheme.colors.textSecondary,
+                )
+            }
         }
 
         HealthRecordsCard(
@@ -208,6 +224,7 @@ private fun TodayScreenPreviewContent() {
         ),
         onOpenLatestRecord = {},
         onAddHealthRecord = {},
+        onOpenProfile = {},
         onOpenSurvey = {},
         onVitaminCheckedChange = { _, _ -> },
     )

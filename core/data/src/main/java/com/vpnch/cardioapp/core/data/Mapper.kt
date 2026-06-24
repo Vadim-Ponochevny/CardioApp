@@ -30,6 +30,7 @@ internal fun HealthRecordEntity.asExternalModel() = HealthRecord(
     respiratoryRate = respiratoryRate,
     heartRate = heartRate,
     oxygenSaturation = oxygenSaturation,
+    inr = inr,
 )
 
 internal fun HealthRecord.asEntity() = HealthRecordEntity(
@@ -42,6 +43,7 @@ internal fun HealthRecord.asEntity() = HealthRecordEntity(
     respiratoryRate = respiratoryRate,
     heartRate = heartRate,
     oxygenSaturation = oxygenSaturation,
+    inr = inr,
 )
 
 internal fun SingleMetricLimitEntity.asExternalModel() = SingleMetricLimits(
@@ -118,6 +120,31 @@ internal fun HelpContactEntity.asExternalModel() = HelpContact(
     description = description,
     sortOrder = sortOrder,
     isActive = isActive,
+)
+
+internal fun SingleMetricLimits.asEntity() = SingleMetricLimitEntity(
+    id = id,
+    ageGroup = ageGroup.name,
+    metricType = metricType.name,
+    normalMin = normalMin,
+    normalMax = normalMax,
+    attentionMin = attentionMin,
+    attentionMax = attentionMax,
+    doctorSoonMin = doctorSoonMin,
+    doctorSoonMax = doctorSoonMax,
+)
+
+internal fun BloodPressureLimits.asEntity() = BloodPressureLimitEntity(
+    id = id,
+    ageGroup = ageGroup.name,
+    normalSystolicMin = normalSystolicMin,
+    normalSystolicMax = normalSystolicMax,
+    normalDiastolicMin = normalDiastolicMin,
+    normalDiastolicMax = normalDiastolicMax,
+    doctorSoonSystolicLow = doctorSoonSystolicLow,
+    doctorSoonSystolicHigh = doctorSoonSystolicHigh,
+    doctorSoonDiastolicLow = doctorSoonDiastolicLow,
+    doctorSoonDiastolicHigh = doctorSoonDiastolicHigh,
 )
 
 internal fun FaqEntity.asExternalModel() = Faq(

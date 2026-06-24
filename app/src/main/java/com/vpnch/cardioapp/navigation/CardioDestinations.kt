@@ -18,6 +18,7 @@ object CardioDestinations {
     const val VITAMINS = "vitamins"
     const val HISTORY = "history"
     const val HELP = "help"
+    const val PROFILE = "profile"
 //    const val SURVEY = "survey?url={url}"
 //    const val SURVEY_URL_ARG = "url"
 //

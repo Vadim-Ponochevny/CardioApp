@@ -9,4 +9,6 @@ interface PatientRepository {
     suspend fun getCurrentPatient(): Patient?
 
     suspend fun savePatient(patient: Patient)
+
+    fun isProfileComplete(): Flow<Boolean>
 }

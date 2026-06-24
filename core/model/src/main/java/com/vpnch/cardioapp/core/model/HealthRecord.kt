@@ -10,4 +10,5 @@ data class HealthRecord(
     val respiratoryRate: Int?,
     val heartRate: Int?,
     val oxygenSaturation: Int?,
+    val inr: Int? = null,
 )

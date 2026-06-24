@@ -61,4 +61,12 @@ class HealthRecordRepositoryImpl @Inject constructor(
     override suspend fun getBloodPressureLimits(ageGroup: AgeGroup): BloodPressureLimits? {
         return healthRecordDao.getBloodPressureLimits(ageGroup.name)?.asExternalModel()
     }
+
+    override suspend fun upsertSingleMetricLimits(limits: List<SingleMetricLimits>) {
+        healthRecordDao.upsertSingleMetricLimits(limits.map { it.asEntity() })
+    }
+
+    override suspend fun upsertBloodPressureLimits(limits: List<BloodPressureLimits>) {
+        healthRecordDao.upsertBloodPressureLimits(limits.map { it.asEntity() })
+    }
 }

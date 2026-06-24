@@ -8,6 +8,7 @@ import com.vpnch.cardioapp.core.domain.MetricLimitsBundle
 import com.vpnch.cardioapp.core.domain.PatientRepository
 import com.vpnch.cardioapp.core.domain.SurveyRepository
 import com.vpnch.cardioapp.core.domain.VitaminRepository
+import com.vpnch.cardioapp.core.model.AgeGroup
 import com.vpnch.cardioapp.core.model.HealthRecord
 import com.vpnch.cardioapp.core.model.formatAsHealthMetric
 import com.vpnch.cardioapp.core.model.formatBloodPressure
@@ -42,11 +43,12 @@ class TodayViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val currentPatient = patientRepository.getCurrentPatient() ?: return@launch
+            val limitsAgeGroup = if (currentPatient.useCustomLimits) AgeGroup.Custom else currentPatient.ageGroup
             limitsBundle.value = MetricLimitsBundle(
                 singleLimits = healthRecordRepository
-                    .getSingleMetricLimits(currentPatient.ageGroup)
+                    .getSingleMetricLimits(limitsAgeGroup)
                     .associateBy { it.metricType },
-                bloodPressureLimits = healthRecordRepository.getBloodPressureLimits(currentPatient.ageGroup),
+                bloodPressureLimits = healthRecordRepository.getBloodPressureLimits(limitsAgeGroup),
             )
         }
     }

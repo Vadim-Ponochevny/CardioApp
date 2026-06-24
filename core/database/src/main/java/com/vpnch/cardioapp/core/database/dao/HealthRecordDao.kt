@@ -60,6 +60,9 @@ interface HealthRecordDao {
     @Upsert
     suspend fun upsertBloodPressureLimits(metricLimits: List<BloodPressureLimitEntity>)
 
+    @Query("SELECT * FROM single_metric_limits WHERE id = :id LIMIT 1")
+    suspend fun getSingleMetricLimitById(id: String): SingleMetricLimitEntity?
+
     @Query("SELECT * FROM single_metric_limits WHERE ageGroup = :ageGroup")
     suspend fun getSingleMetricLimits(ageGroup: String): List<SingleMetricLimitEntity>
 

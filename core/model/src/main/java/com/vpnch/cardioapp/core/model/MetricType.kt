@@ -5,4 +5,5 @@ enum class MetricType {
     RespiratoryRate,
     HeartRate,
     OxygenSaturation,
+    INR,
 }

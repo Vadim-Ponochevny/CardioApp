@@ -5,4 +5,7 @@ data class Patient(
     val birthDate: String,
     val ageGroup: AgeGroup,
     val userType: UserType,
+    val takesWarfarin: Boolean = false,
+    val valveType: ValveType? = null,
+    val useCustomLimits: Boolean = false,
 )

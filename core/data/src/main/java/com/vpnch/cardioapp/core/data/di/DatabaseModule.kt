@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
 import com.vpnch.cardioapp.core.database.CardioDatabase
 import com.vpnch.cardioapp.core.database.migration.MIGRATION_1_2
+import com.vpnch.cardioapp.core.database.migration.MIGRATION_2_3
 import com.vpnch.cardioapp.core.database.dao.HealthRecordDao
 import com.vpnch.cardioapp.core.database.dao.HelpDao
 import com.vpnch.cardioapp.core.database.dao.SurveyDao
@@ -32,7 +33,7 @@ object DatabaseModule {
             CardioDatabase::class.java,
             "cardio.db",
         )
-            .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
             .build()
     }
 

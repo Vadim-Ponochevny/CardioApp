@@ -11,7 +11,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -23,7 +22,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.vpnch.cardioapp.core.ui.CardioDimens
@@ -32,9 +30,9 @@ import com.vpnch.cardioapp.feature.healthrecords.create.HealthRecordCreateRoute
 import com.vpnch.cardioapp.feature.healthrecords.detail.HealthRecordDetailRoute
 import com.vpnch.cardioapp.feature.healthrecords.edit.HealthMetricEditRoute
 import com.vpnch.cardioapp.feature.help.HelpRoute
-import com.vpnch.cardioapp.feature.history.HistoryRoute
+import com.vpnch.cardioapp.feature.history.presentation.HistoryRoute
+import com.vpnch.cardioapp.feature.profile.ProfileRoute
 import com.vpnch.cardioapp.feature.today.TodayRoute
-import com.vpnch.cardioapp.feature.vitamins.VitaminsRoute
 import com.vpnch.cardioapp.core.ui.theme.CardioTheme
 import com.vpnch.cardioapp.navigation.CardioDestinations.HEALTH_RECORD_DETAIL_ARG
 
@@ -98,6 +96,15 @@ fun CardioNavHost(
                     onAddHealthRecord = {
                         navController.navigate(CardioDestinations.healthRecordCreate())
                     },
+                    onOpenProfile = {
+                        navController.navigate(CardioDestinations.PROFILE)
+                    },
+                )
+            }
+
+            composable(route = CardioDestinations.PROFILE) {
+                ProfileRoute(
+                    onSaved = { navController.popBackStack() },
                 )
             }
 
@@ -199,7 +206,8 @@ private fun NavDestination?.showsBottomBar(): Boolean {
     val route = this?.route ?: return false
     return route == CardioDestinations.TODAY_HOME ||
         route == CardioDestinations.HISTORY ||
-        route == CardioDestinations.HELP
+        route == CardioDestinations.HELP ||
+        route == CardioDestinations.VITAMINS
 }
 
 fun NavController.safeNavigate(route: String) {
