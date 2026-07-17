@@ -3,7 +3,7 @@ package com.vpnch.cardioapp.core.database.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
-import com.vpnch.cardioapp.core.database.entity.SurveyLinkEntity
+import com.vpnch.cardioapp.core.database.entity.survey.SurveyLinkEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

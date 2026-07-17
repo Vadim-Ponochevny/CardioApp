@@ -15,6 +15,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.vpnch.cardioapp.core.ui.CardioPreview
 
+private const val TEXT_TITLE = "Ты молодец!"
+private const val TEXT_SUBTITLE = "Запись сохранена"
+private const val BTN_HOME = "На главный экран"
+
+private val SCREEN_PADDING = 24.dp
+private val SUBTITLE_TOP_PADDING = 12.dp
+private val BUTTON_TOP_PADDING = 32.dp
+
 @Composable
 fun HealthRecordSuccessScreen(
     onFinish: () -> Unit,
@@ -23,18 +31,18 @@ fun HealthRecordSuccessScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(SCREEN_PADDING),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = "Ты молодец!",
+            text = TEXT_TITLE,
             style = MaterialTheme.typography.headlineLarge,
             textAlign = TextAlign.Center,
         )
         Text(
-            text = "Запись сохранена",
-            modifier = Modifier.padding(top = 12.dp),
+            text = TEXT_SUBTITLE,
+            modifier = Modifier.padding(top = SUBTITLE_TOP_PADDING),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
         )
@@ -42,9 +50,9 @@ fun HealthRecordSuccessScreen(
             onClick = onFinish,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 32.dp),
+                .padding(top = BUTTON_TOP_PADDING),
         ) {
-            Text("На главный экран")
+            Text(BTN_HOME)
         }
     }
 }

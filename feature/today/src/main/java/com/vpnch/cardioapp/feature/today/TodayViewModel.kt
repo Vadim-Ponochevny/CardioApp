@@ -1,18 +1,20 @@
-package com.vpnch.cardioapp.feature.today
+﻿package com.vpnch.cardioapp.feature.today
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vpnch.cardioapp.core.domain.EvaluateHealthRecordLimitsUseCase
-import com.vpnch.cardioapp.core.domain.HealthRecordRepository
-import com.vpnch.cardioapp.core.domain.MetricLimitsBundle
-import com.vpnch.cardioapp.core.domain.PatientRepository
-import com.vpnch.cardioapp.core.domain.SurveyRepository
-import com.vpnch.cardioapp.core.domain.VitaminRepository
-import com.vpnch.cardioapp.core.model.AgeGroup
-import com.vpnch.cardioapp.core.model.HealthRecord
-import com.vpnch.cardioapp.core.model.formatAsHealthMetric
-import com.vpnch.cardioapp.core.model.formatBloodPressure
-import com.vpnch.cardioapp.core.model.isOutOfNorm
+import com.vpnch.cardioapp.core.domain.analytics.Analytics
+import com.vpnch.cardioapp.core.domain.analytics.AnalyticsEvent
+import com.vpnch.cardioapp.core.domain.usecase.EvaluateHealthRecordLimitsUseCase
+import com.vpnch.cardioapp.core.domain.repository.HealthRecordRepository
+import com.vpnch.cardioapp.core.model.health.limits.MetricLimitsBundle
+import com.vpnch.cardioapp.core.domain.repository.PatientRepository
+import com.vpnch.cardioapp.core.domain.repository.SurveyRepository
+import com.vpnch.cardioapp.core.domain.repository.VitaminRepository
+import com.vpnch.cardioapp.core.model.patient.AgeGroup
+import com.vpnch.cardioapp.core.model.health.HealthRecord
+import com.vpnch.cardioapp.core.model.health.formatAsHealthMetric
+import com.vpnch.cardioapp.core.model.health.formatBloodPressure
+import com.vpnch.cardioapp.core.model.health.isOutOfNorm
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,10 +36,11 @@ class TodayViewModel @Inject constructor(
     healthRecordRepository: HealthRecordRepository,
     surveyRepository: SurveyRepository,
     private val evaluateLimits: EvaluateHealthRecordLimitsUseCase,
+    private val analytics: Analytics,
 ) : ViewModel() {
 
     private val today = currentDate()
-    private val patient = patientRepository.observeCurrentPatient()
+    private val patient = patientRepository.currentPatient
     private val limitsBundle = MutableStateFlow<MetricLimitsBundle?>(null)
 
     init {
@@ -83,6 +86,7 @@ class TodayViewModel @Inject constructor(
     fun setVitaminTaken(patientId: String, vitaminId: String, isTaken: Boolean) {
         viewModelScope.launch {
             vitaminRepository.setVitaminTaken(patientId, today, vitaminId, isTaken)
+            if (isTaken) analytics.report(AnalyticsEvent.MedicineMarked)
         }
     }
 

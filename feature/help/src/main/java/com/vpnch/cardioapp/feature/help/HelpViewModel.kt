@@ -1,10 +1,12 @@
-package com.vpnch.cardioapp.feature.help
+﻿package com.vpnch.cardioapp.feature.help
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vpnch.cardioapp.core.domain.HelpRepository
-import com.vpnch.cardioapp.core.domain.SurveyRepository
-import com.vpnch.cardioapp.core.model.HelpContact
+import com.vpnch.cardioapp.core.domain.analytics.Analytics
+import com.vpnch.cardioapp.core.domain.analytics.AnalyticsEvent
+import com.vpnch.cardioapp.core.domain.repository.HelpRepository
+import com.vpnch.cardioapp.core.domain.repository.SurveyRepository
+import com.vpnch.cardioapp.core.model.help.HelpContact
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,6 +17,7 @@ import kotlinx.coroutines.flow.stateIn
 class HelpViewModel @Inject constructor(
     helpRepository: HelpRepository,
     surveyRepository: SurveyRepository,
+    private val analytics: Analytics,
 ) : ViewModel() {
 
     val uiState = combine(
@@ -31,6 +34,14 @@ class HelpViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = HelpUiState(),
     )
+
+    fun onCallPressed() {
+        analytics.report(AnalyticsEvent.CallButtonPressed)
+    }
+
+    fun onSurveyOpened() {
+        analytics.report(AnalyticsEvent.QuestionnaireOpened)
+    }
 }
 
 data class HelpUiState(

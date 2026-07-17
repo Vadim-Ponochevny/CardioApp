@@ -1,15 +1,15 @@
-package com.vpnch.cardioapp.core.data.di
+﻿package com.vpnch.cardioapp.core.data.di
 
-import com.vpnch.cardioapp.core.data.HealthRecordRepositoryImpl
-import com.vpnch.cardioapp.core.data.HelpRepositoryImpl
-import com.vpnch.cardioapp.core.data.PatientRepositoryImpl
-import com.vpnch.cardioapp.core.data.SurveyRepositoryImpl
-import com.vpnch.cardioapp.core.data.VitaminRepositoryImpl
-import com.vpnch.cardioapp.core.domain.HealthRecordRepository
-import com.vpnch.cardioapp.core.domain.HelpRepository
-import com.vpnch.cardioapp.core.domain.PatientRepository
-import com.vpnch.cardioapp.core.domain.SurveyRepository
-import com.vpnch.cardioapp.core.domain.VitaminRepository
+import com.vpnch.cardioapp.core.data.repository.HealthRecordRepositoryImpl
+import com.vpnch.cardioapp.core.data.repository.HelpRepositoryImpl
+import com.vpnch.cardioapp.core.data.repository.PatientRepositoryImpl
+import com.vpnch.cardioapp.core.data.repository.SurveyRepositoryImpl
+import com.vpnch.cardioapp.core.data.repository.VitaminRepositoryImpl
+import com.vpnch.cardioapp.core.domain.repository.HealthRecordRepository
+import com.vpnch.cardioapp.core.domain.repository.HelpRepository
+import com.vpnch.cardioapp.core.domain.repository.PatientRepository
+import com.vpnch.cardioapp.core.domain.repository.SurveyRepository
+import com.vpnch.cardioapp.core.domain.repository.VitaminRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

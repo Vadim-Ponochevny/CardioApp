@@ -1,6 +1,5 @@
 package com.vpnch.cardioapp.core.ui.theme
 
-import androidx.compose.foundation.background
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Immutable

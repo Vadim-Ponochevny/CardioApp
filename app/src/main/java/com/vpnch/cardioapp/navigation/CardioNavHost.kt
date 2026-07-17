@@ -1,5 +1,9 @@
 package com.vpnch.cardioapp.navigation
 
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -9,6 +13,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -22,6 +27,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.vpnch.cardioapp.core.ui.CardioDimens
@@ -33,6 +39,7 @@ import com.vpnch.cardioapp.feature.help.HelpRoute
 import com.vpnch.cardioapp.feature.history.presentation.HistoryRoute
 import com.vpnch.cardioapp.feature.profile.ProfileRoute
 import com.vpnch.cardioapp.feature.today.TodayRoute
+import com.vpnch.cardioapp.feature.vitamins.VitaminsRoute
 import com.vpnch.cardioapp.core.ui.theme.CardioTheme
 import com.vpnch.cardioapp.navigation.CardioDestinations.HEALTH_RECORD_DETAIL_ARG
 
@@ -41,6 +48,16 @@ fun CardioNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
 ) {
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { /* user responded — no action needed, system handles the grant */ }
+
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
@@ -88,23 +105,31 @@ fun CardioNavHost(
             modifier = Modifier.padding(innerPadding),
         ) {
 
-            composable(route = CardioDestinations.TODAY_HOME) {
-                TodayRoute(
-                    onOpenLatestRecord = { recordId ->
-                        navController.navigate(CardioDestinations.healthRecordDetail(recordId))
-                    },
-                    onAddHealthRecord = {
-                        navController.navigate(CardioDestinations.healthRecordCreate())
-                    },
-                    onOpenProfile = {
-                        navController.navigate(CardioDestinations.PROFILE)
-                    },
-                )
+            navigation(
+                startDestination = CardioDestinations.TODAY_HOME,
+                route = CardioDestinations.TODAY_GRAPH,
+            ) {
+                composable(route = CardioDestinations.TODAY_HOME) {
+                    TodayRoute(
+                        onOpenLatestRecord = { recordId ->
+                            navController.navigate(CardioDestinations.healthRecordDetail(recordId))
+                        },
+                        onAddHealthRecord = {
+                            navController.navigate(CardioDestinations.healthRecordCreate())
+                        },
+                        onOpenProfile = {
+                            navController.navigate(CardioDestinations.PROFILE)
+                        },
+                        onOpenVitamins = {
+                            navController.navigate(CardioDestinations.VITAMINS)
+                        },
+                    )
+                }
             }
 
             composable(route = CardioDestinations.PROFILE) {
                 ProfileRoute(
-                    onSaved = { navController.popBackStack() },
+                    onBack = { navController.popBackStack() },
                 )
             }
 
@@ -194,6 +219,12 @@ fun CardioNavHost(
                         },
                     )
                 }
+
+            composable(CardioDestinations.VITAMINS) {
+                VitaminsRoute(
+                    onBack = { navController.popBackStack() },
+                )
+            }
 
             composable(CardioDestinations.HELP) {
                 HelpRoute()

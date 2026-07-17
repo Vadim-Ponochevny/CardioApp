@@ -9,28 +9,6 @@ val LocalCardioTypography = staticCompositionLocalOf { DefaultCardioTypography }
 val LocalCardioColors = staticCompositionLocalOf { DefaultCardioColors }
 
 @Composable
-fun ProvideCardioTypography(
-    typography: CardioTypography = DefaultCardioTypography,
-    content: @Composable () -> Unit,
-) {
-    CompositionLocalProvider(
-        LocalCardioTypography provides typography,
-        content = content,
-    )
-}
-
-@Composable
-fun ProvideCardioColors(
-    colors: CardioColors = DefaultCardioColors,
-    content: @Composable () -> Unit,
-) {
-    CompositionLocalProvider(
-        LocalCardioColors provides colors,
-        content = content,
-    )
-}
-
-@Composable
 fun ProvideCardioTheme(
     typography: CardioTypography = DefaultCardioTypography,
     colors: CardioColors = DefaultCardioColors,

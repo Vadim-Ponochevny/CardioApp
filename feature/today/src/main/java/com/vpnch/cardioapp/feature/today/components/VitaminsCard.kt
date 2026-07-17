@@ -1,4 +1,4 @@
-package com.vpnch.cardioapp.feature.today.components
+﻿package com.vpnch.cardioapp.feature.today.components
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -22,15 +22,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -44,24 +43,39 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.vpnch.cardioapp.core.model.VitaminIntakeSummary
+import com.vpnch.cardioapp.core.model.vitamins.VitaminIntakeSummary
 import com.vpnch.cardioapp.core.ui.theme.CardioTheme
 
 @Composable
 fun VitaminsSection(
     vitaminIntakes: List<VitaminIntakeSummary>,
     onVitaminCheckedChange: (VitaminIntakeSummary, Boolean) -> Unit,
+    onOpenVitamins: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text(
-            text = "Витаминки",
-            style = CardioTheme.typography.itemTitle,
-            color = CardioTheme.colors.textMain,
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = "Витаминки",
+                style = CardioTheme.typography.itemTitle,
+                color = CardioTheme.colors.textMain,
+            )
+            IconButton(onClick = onOpenVitamins, modifier = Modifier.size(40.dp)) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = "Управление витаминками",
+                    tint = CardioTheme.colors.textSecondary,
+                    modifier = Modifier.size(28.dp),
+                )
+            }
+        }
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(horizontal = 0.dp),

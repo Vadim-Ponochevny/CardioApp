@@ -6,15 +6,15 @@ import com.vpnch.cardioapp.core.database.dao.HealthRecordDao
 import com.vpnch.cardioapp.core.database.dao.HelpDao
 import com.vpnch.cardioapp.core.database.dao.SurveyDao
 import com.vpnch.cardioapp.core.database.dao.VitaminDao
-import com.vpnch.cardioapp.core.database.entity.BloodPressureLimitEntity
-import com.vpnch.cardioapp.core.database.entity.FaqEntity
-import com.vpnch.cardioapp.core.database.entity.HealthRecordEntity
-import com.vpnch.cardioapp.core.database.entity.HelpContactEntity
-import com.vpnch.cardioapp.core.database.entity.SingleMetricLimitEntity
-import com.vpnch.cardioapp.core.database.entity.SurveyLinkEntity
-import com.vpnch.cardioapp.core.database.entity.VitaminEntity
-import com.vpnch.cardioapp.core.database.entity.VitaminIntakeDayEntity
-import com.vpnch.cardioapp.core.database.entity.VitaminIntakeEntity
+import com.vpnch.cardioapp.core.database.entity.health.limits.BloodPressureLimitEntity
+import com.vpnch.cardioapp.core.database.entity.help.FaqEntity
+import com.vpnch.cardioapp.core.database.entity.health.HealthRecordEntity
+import com.vpnch.cardioapp.core.database.entity.help.HelpContactEntity
+import com.vpnch.cardioapp.core.database.entity.health.limits.SingleMetricLimitEntity
+import com.vpnch.cardioapp.core.database.entity.survey.SurveyLinkEntity
+import com.vpnch.cardioapp.core.database.entity.vitamins.VitaminEntity
+import com.vpnch.cardioapp.core.database.entity.vitamins.VitaminIntakeDayEntity
+import com.vpnch.cardioapp.core.database.entity.vitamins.VitaminIntakeEntity
 
 @Database(
     entities = [

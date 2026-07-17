@@ -1,29 +1,39 @@
 package com.vpnch.cardioapp.feature.vitamins
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.vpnch.cardioapp.core.ui.CardioPreview
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.vpnch.cardioapp.feature.vitamins.components.AddVitaminDialog
 
 @Composable
-fun VitaminsRoute(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-    ) {
-        Text("Витаминки", style = MaterialTheme.typography.headlineMedium)
-        Text("Здесь будет список, создание и редактирование витаминок.")
+fun VitaminsRoute(
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: VitaminsViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    var showAddDialog by rememberSaveable { mutableStateOf(false) }
+
+    VitaminsScreen(
+        uiState = uiState,
+        onBack = onBack,
+        onAddClick = { showAddDialog = true },
+        onDeleteVitamin = viewModel::deleteVitamin,
+        modifier = modifier,
+    )
+
+    if (showAddDialog) {
+        AddVitaminDialog(
+            onDismiss = { showAddDialog = false },
+            onConfirm = { name ->
+                viewModel.addVitamin(name)
+                showAddDialog = false
+            },
+        )
     }
-}
-
-@CardioPreview
-@Composable
-private fun VitaminsRoutePreview() {
-    VitaminsRoute()
 }

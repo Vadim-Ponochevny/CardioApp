@@ -11,6 +11,7 @@ fun TodayRoute(
     onOpenLatestRecord: (String) -> Unit,
     onAddHealthRecord: () -> Unit,
     onOpenProfile: () -> Unit,
+    onOpenVitamins: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val viewModel: TodayViewModel = hiltViewModel()
@@ -25,6 +26,7 @@ fun TodayRoute(
         onVitaminCheckedChange = { summary, checked ->
             viewModel.setVitaminTaken(summary.vitamin.patientId, summary.vitamin.id, checked)
         },
+        onOpenVitamins = onOpenVitamins,
         modifier = modifier,
     )
 }

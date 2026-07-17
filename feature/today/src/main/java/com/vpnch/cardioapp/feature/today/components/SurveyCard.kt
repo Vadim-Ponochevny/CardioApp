@@ -1,4 +1,4 @@
-package com.vpnch.cardioapp.feature.today.components
+﻿package com.vpnch.cardioapp.feature.today.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.vpnch.cardioapp.core.model.SurveyLink
+import com.vpnch.cardioapp.core.model.survey.SurveyLink
 
 @Composable
 fun SurveyCard(

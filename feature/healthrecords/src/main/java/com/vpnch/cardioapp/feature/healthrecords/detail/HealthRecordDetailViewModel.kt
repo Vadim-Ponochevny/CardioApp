@@ -3,16 +3,12 @@ package com.vpnch.cardioapp.feature.healthrecords.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vpnch.cardioapp.core.domain.EvaluateHealthRecordLimitsUseCase
-import com.vpnch.cardioapp.core.domain.HealthRecordRepository
-import com.vpnch.cardioapp.core.domain.MetricLimitsBundle
-import com.vpnch.cardioapp.core.domain.PatientRepository
-import com.vpnch.cardioapp.core.model.HealthRecord
-import com.vpnch.cardioapp.core.model.formatAsHealthMetric
-import com.vpnch.cardioapp.core.model.formatBloodPressure
-import com.vpnch.cardioapp.core.model.MetricStatus
-import com.vpnch.cardioapp.core.model.isOutOfNorm
-import com.vpnch.cardioapp.feature.healthrecords.HealthMetricKind
+import com.vpnch.cardioapp.core.domain.usecase.EvaluateHealthRecordLimitsUseCase
+import com.vpnch.cardioapp.core.domain.repository.HealthRecordRepository
+import com.vpnch.cardioapp.core.model.health.limits.MetricLimitsBundle
+import com.vpnch.cardioapp.core.domain.repository.PatientRepository
+import com.vpnch.cardioapp.core.model.common.DateUtils
+import com.vpnch.cardioapp.core.model.patient.AgeGroup
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,112 +16,72 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import com.vpnch.cardioapp.core.model.health.HealthRecord
+import com.vpnch.cardioapp.feature.healthrecords.detail.mapper.toMetricItems
+import kotlinx.coroutines.flow.StateFlow
 
 @HiltViewModel
 class HealthRecordDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    patientRepository: PatientRepository,
-    healthRecordRepository: HealthRecordRepository,
+    private val patientRepository: PatientRepository,
+    private val healthRecordRepository: HealthRecordRepository,
     private val evaluateLimits: EvaluateHealthRecordLimitsUseCase,
 ) : ViewModel() {
 
     private val recordId: String = checkNotNull(savedStateHandle[RECORD_ID_ARG])
+
     private val limitsBundle = MutableStateFlow<MetricLimitsBundle?>(null)
 
     init {
-        viewModelScope.launch {
-            val patient = patientRepository.getCurrentPatient() ?: return@launch
-            limitsBundle.value = MetricLimitsBundle(
-                singleLimits = healthRecordRepository
-                    .getSingleMetricLimits(patient.ageGroup)
-                    .associateBy { it.metricType },
-                bloodPressureLimits = healthRecordRepository.getBloodPressureLimits(patient.ageGroup),
-            )
-        }
+        loadLimits()
     }
 
-    val uiState = combine(
+    val uiState: StateFlow<HealthRecordDetailUiState> = combine(
         healthRecordRepository.observeRecord(recordId),
         limitsBundle,
     ) { record, limits ->
-        if (record == null) {
-            HealthRecordDetailUiState(isLoading = false, loadError = true)
+        buildUiState(record, limits)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+        initialValue = HealthRecordDetailUiState(isLoading = true),
+    )
+
+
+    private fun loadLimits() {
+        viewModelScope.launch {
+            val patient = patientRepository.getCurrentPatient() ?: return@launch
+            val ageGroup = if (patient.useCustomLimits) AgeGroup.Custom else patient.ageGroup
+
+            limitsBundle.value = MetricLimitsBundle(
+                singleLimits = healthRecordRepository
+                    .getSingleMetricLimits(ageGroup)
+                    .associateBy { it.metricType },
+                bloodPressureLimits = healthRecordRepository.getBloodPressureLimits(ageGroup),
+            )
+        }
+    }
+
+    private fun buildUiState(
+        record: HealthRecord?,
+        limits: MetricLimitsBundle?,
+    ): HealthRecordDetailUiState {
+        return if (record == null) {
+            HealthRecordDetailUiState(
+                isLoading = false,
+                loadError = true,
+            )
         } else {
             HealthRecordDetailUiState(
                 isLoading = false,
-                timeLabel = formatRecordTime(record.createdAt),
+                timeLabel = DateUtils.formatTime(record.createdAt),
                 metrics = record.toMetricItems(limits, evaluateLimits),
             )
         }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = HealthRecordDetailUiState(),
-    )
+    }
 
     companion object {
         const val RECORD_ID_ARG = "recordId"
+        private const val STOP_TIMEOUT_MILLIS = 5_000L
     }
-}
-
-data class HealthRecordDetailUiState(
-    val isLoading: Boolean = true,
-    val loadError: Boolean = false,
-    val timeLabel: String = "",
-    val metrics: List<MetricItem> = emptyList(),
-)
-
-data class MetricItem(
-    val kind: HealthMetricKind,
-    val title: String,
-    val value: String,
-    val isOutOfNorm: Boolean,
-    val isCritical: Boolean = false,
-)
-
-private fun HealthRecord.toMetricItems(
-    limits: MetricLimitsBundle?,
-    evaluateLimits: EvaluateHealthRecordLimitsUseCase,
-): List<MetricItem> {
-    val evaluation = limits?.let {
-        evaluateLimits.evaluate(this, it.singleLimits, it.bloodPressureLimits)
-    }
-
-    return listOf(
-        MetricItem(
-            kind = HealthMetricKind.BloodPressure,
-            title = "Давление",
-            value = formatBloodPressure(systolicPressure, diastolicPressure),
-            isOutOfNorm = evaluation?.bloodPressure.isOutOfNorm(),
-            isCritical = evaluation?.bloodPressure == MetricStatus.DoctorSoon,
-        ),
-        MetricItem(
-            kind = HealthMetricKind.RespiratoryRate,
-            title = "Дыхание",
-            value = respiratoryRate.formatAsHealthMetric(),
-            isOutOfNorm = evaluation?.respiratoryRate.isOutOfNorm(),
-            isCritical = evaluation?.respiratoryRate == MetricStatus.DoctorSoon,
-        ),
-        MetricItem(
-            kind = HealthMetricKind.HeartRate,
-            title = "Пульс",
-            value = heartRate.formatAsHealthMetric(),
-            isOutOfNorm = evaluation?.heartRate.isOutOfNorm(),
-            isCritical = evaluation?.heartRate == MetricStatus.DoctorSoon,
-        ),
-        MetricItem(
-            kind = HealthMetricKind.OxygenSaturation,
-            title = "Кислород",
-            value = oxygenSaturation.formatAsHealthMetric(),
-            isOutOfNorm = evaluation?.oxygenSaturation.isOutOfNorm(),
-            isCritical = evaluation?.oxygenSaturation == MetricStatus.DoctorSoon,
-        ),
-    )
-}
-
-private fun formatRecordTime(timestamp: Long): String {
-    return SimpleDateFormat("HH:mm", Locale("ru", "RU")).format(Date(timestamp))
 }

@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.vpnch.cardioapp.core.ui.theme.CardioTheme
-import com.vpnch.cardioapp.core.model.MISSING_METRIC_LABEL
+import com.vpnch.cardioapp.core.model.health.MISSING_METRIC_LABEL
 import com.vpnch.cardioapp.feature.today.LatestHealthRecordSummary
 import com.vpnch.cardioapp.feature.today.TodayMetricIcons
 import com.vpnch.cardioapp.feature.today.TodayMetricItem

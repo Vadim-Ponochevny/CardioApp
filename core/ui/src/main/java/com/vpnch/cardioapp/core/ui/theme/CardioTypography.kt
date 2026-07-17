@@ -48,7 +48,7 @@ val DefaultCardioTypography = CardioTypography(
 )
 
 /**
- * Маппинг семантических стилей на слоты Material Typography для обратной совместимости.
+ * Маппинг семантических стилей на слоты Material Typography для обратной совместимости (не используется).
  */
 fun CardioTypography.asMaterialTypography(): Typography = Typography(
     displayLarge = inputValue,

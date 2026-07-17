@@ -3,9 +3,9 @@ package com.vpnch.cardioapp.core.database.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
-import com.vpnch.cardioapp.core.database.entity.BloodPressureLimitEntity
-import com.vpnch.cardioapp.core.database.entity.HealthRecordEntity
-import com.vpnch.cardioapp.core.database.entity.SingleMetricLimitEntity
+import com.vpnch.cardioapp.core.database.entity.health.limits.BloodPressureLimitEntity
+import com.vpnch.cardioapp.core.database.entity.health.HealthRecordEntity
+import com.vpnch.cardioapp.core.database.entity.health.limits.SingleMetricLimitEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

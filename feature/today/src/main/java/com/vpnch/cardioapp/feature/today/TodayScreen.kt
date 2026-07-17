@@ -1,4 +1,4 @@
-package com.vpnch.cardioapp.feature.today
+﻿package com.vpnch.cardioapp.feature.today
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,23 +23,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
-import com.vpnch.cardioapp.core.model.SurveyLink
-import com.vpnch.cardioapp.core.model.Vitamin
-import com.vpnch.cardioapp.core.model.VitaminIntake
-import com.vpnch.cardioapp.core.model.VitaminIntakeSummary
+import com.vpnch.cardioapp.core.model.survey.SurveyLink
+import com.vpnch.cardioapp.core.model.vitamins.Vitamin
+import com.vpnch.cardioapp.core.model.vitamins.VitaminIntake
+import com.vpnch.cardioapp.core.model.vitamins.VitaminIntakeSummary
 import com.vpnch.cardioapp.core.ui.CardioPreview
 import com.vpnch.cardioapp.core.ui.CardioPreviewTheme
 import com.vpnch.cardioapp.core.ui.theme.CardioTheme
 import com.vpnch.cardioapp.feature.today.components.HealthRecordsCard
-import com.vpnch.cardioapp.feature.today.components.SurveyCard
 import com.vpnch.cardioapp.feature.today.components.VitaminsSection
-import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Calendar
-import java.util.Date
 
 @Composable
 fun TodayScreen(
@@ -49,6 +43,7 @@ fun TodayScreen(
     onOpenProfile: () -> Unit,
     onOpenSurvey: (SurveyLink) -> Unit,
     onVitaminCheckedChange: (VitaminIntakeSummary, Boolean) -> Unit,
+    onOpenVitamins: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (uiState.isLoading) {
@@ -132,6 +127,7 @@ fun TodayScreen(
         VitaminsSection(
             vitaminIntakes = uiState.vitaminIntakes,
             onVitaminCheckedChange = onVitaminCheckedChange,
+            onOpenVitamins = onOpenVitamins,
         )
 
 //        SurveyCard(
@@ -227,6 +223,7 @@ private fun TodayScreenPreviewContent() {
         onOpenProfile = {},
         onOpenSurvey = {},
         onVitaminCheckedChange = { _, _ -> },
+        onOpenVitamins = {},
     )
 }
 

@@ -19,10 +19,6 @@ object CardioDestinations {
     const val HISTORY = "history"
     const val HELP = "help"
     const val PROFILE = "profile"
-//    const val SURVEY = "survey?url={url}"
-//    const val SURVEY_URL_ARG = "url"
-//
-//    fun survey(url: String): String = "survey?url=${android.net.Uri.encode(url)}"
 
     fun healthRecordCreate(recordId: String? = null): String {
         return if (recordId == null) {

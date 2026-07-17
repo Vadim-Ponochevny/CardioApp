@@ -1,9 +1,6 @@
 package com.vpnch.cardioapp.core.data.di
 
 import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
 import com.vpnch.cardioapp.core.database.CardioDatabase
 import com.vpnch.cardioapp.core.database.migration.MIGRATION_1_2
@@ -17,12 +14,13 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import java.io.File
 import javax.inject.Singleton
+
+//private const val USER_PREFERENCES_NAME = "user_profile.preferences_pb"
 
 @Module
 @InstallIn(SingletonComponent::class)
-object DatabaseModule {
+internal object DatabaseModule {
     @Provides
     @Singleton
     fun provideCardioDatabase(
@@ -34,17 +32,8 @@ object DatabaseModule {
             "cardio.db",
         )
             .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+            .fallbackToDestructiveMigration()
             .build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideUserProfileDataStore(
-        @ApplicationContext context: Context,
-    ): DataStore<Preferences> {
-        return PreferenceDataStoreFactory.create(
-            produceFile = { File(context.filesDir, "user_profile.preferences_pb") },
-        )
     }
 
     @Provides

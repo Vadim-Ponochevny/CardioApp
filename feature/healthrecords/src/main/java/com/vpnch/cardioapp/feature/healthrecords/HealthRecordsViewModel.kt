@@ -3,13 +3,14 @@ package com.vpnch.cardioapp.feature.healthrecords
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vpnch.cardioapp.core.domain.EvaluateHealthRecordLimitsUseCase
-import com.vpnch.cardioapp.core.domain.HealthRecordRepository
-import com.vpnch.cardioapp.core.domain.MetricLimitsBundle
-import com.vpnch.cardioapp.core.domain.PatientRepository
-import com.vpnch.cardioapp.core.model.HealthRecord
-import com.vpnch.cardioapp.core.model.currentDateKey
-import com.vpnch.cardioapp.core.model.formatHealthRecordsTitle
+import com.vpnch.cardioapp.core.domain.usecase.EvaluateHealthRecordLimitsUseCase
+import com.vpnch.cardioapp.core.domain.repository.HealthRecordRepository
+import com.vpnch.cardioapp.core.model.health.limits.MetricLimitsBundle
+import com.vpnch.cardioapp.core.domain.repository.PatientRepository
+import com.vpnch.cardioapp.core.model.patient.AgeGroup
+import com.vpnch.cardioapp.core.model.common.DateUtils.currentDateKey
+import com.vpnch.cardioapp.core.model.common.DateUtils.formatDayMonthLabel
+import com.vpnch.cardioapp.core.model.health.HealthRecord
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -32,17 +33,18 @@ class HealthRecordsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val dateKey: String = savedStateHandle.get<String>(DATE_ARG) ?: currentDateKey()
-    private val patient = patientRepository.observeCurrentPatient()
+    private val patient = patientRepository.currentPatient
     private val limitsBundle = MutableStateFlow<MetricLimitsBundle?>(null)
 
     init {
         viewModelScope.launch {
             val patient = patientRepository.getCurrentPatient() ?: return@launch
+            val limitsAgeGroup = if (patient.useCustomLimits) AgeGroup.Custom else patient.ageGroup
             limitsBundle.value = MetricLimitsBundle(
                 singleLimits = healthRecordRepository
-                    .getSingleMetricLimits(patient.ageGroup)
+                    .getSingleMetricLimits(limitsAgeGroup)
                     .associateBy { it.metricType },
-                bloodPressureLimits = healthRecordRepository.getBloodPressureLimits(patient.ageGroup),
+                bloodPressureLimits = healthRecordRepository.getBloodPressureLimits(limitsAgeGroup),
             )
         }
     }
@@ -58,16 +60,15 @@ class HealthRecordsViewModel @Inject constructor(
     ) { records, limits ->
         HealthRecordsUiState(
             dateKey = dateKey,
-            title = formatHealthRecordsTitle(dateKey),
-            records = records.map { record ->
-                toListItem(record, limits)
-            },
+            title = "Записи",
+            dateLabel = formatDayMonthLabel(dateKey),
+            records = records.map { record -> toListItem(record, limits) },
             isLoading = false,
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = HealthRecordsUiState(dateKey = dateKey, title = formatHealthRecordsTitle(dateKey)),
+        initialValue = HealthRecordsUiState(dateKey = dateKey, dateLabel = formatDayMonthLabel(dateKey)),
     )
 
     private val _events = MutableSharedFlow<HealthRecordsEvent>()
@@ -83,10 +84,7 @@ class HealthRecordsViewModel @Inject constructor(
         }
     }
 
-    private fun toListItem(
-        record: HealthRecord,
-        limits: MetricLimitsBundle?,
-    ): HealthRecordListItem {
+    private fun toListItem(record: HealthRecord, limits: MetricLimitsBundle?): HealthRecordListItem {
         val evaluation = limits?.let { bundle ->
             evaluateLimits.evaluate(record, bundle.singleLimits, bundle.bloodPressureLimits)
         }
@@ -100,21 +98,4 @@ class HealthRecordsViewModel @Inject constructor(
     companion object {
         const val DATE_ARG = "date"
     }
-}
-
-data class HealthRecordsUiState(
-    val dateKey: String = currentDateKey(),
-    val title: String = formatHealthRecordsTitle(currentDateKey()),
-    val records: List<HealthRecordListItem> = emptyList(),
-    val isLoading: Boolean = true,
-)
-
-data class HealthRecordListItem(
-    val record: HealthRecord,
-    val hasOutOfNorm: Boolean,
-    val hasCritical: Boolean = false,
-)
-
-sealed interface HealthRecordsEvent {
-    data object DeleteFailed : HealthRecordsEvent
 }

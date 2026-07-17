@@ -34,5 +34,6 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.androidx.datastore.core.android)
+    implementation(libs.androidx.work.runtime.ktx)
     ksp(libs.hilt.compiler)
 }

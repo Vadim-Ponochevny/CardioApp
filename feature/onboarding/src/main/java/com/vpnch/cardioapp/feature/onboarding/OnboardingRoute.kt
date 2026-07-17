@@ -1,5 +1,6 @@
 package com.vpnch.cardioapp.feature.onboarding
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -19,10 +20,15 @@ fun OnboardingRoute(
         if (uiState.isComplete) onComplete()
     }
 
+    BackHandler(enabled = uiState.currentStep > 0) {
+        viewModel.onBack()
+    }
+
     OnboardingScreen(
         uiState = uiState,
         onPatientIdChange = viewModel::onPatientIdChange,
         onBirthDateChange = viewModel::onBirthDateChange,
+        onBack = viewModel::onBack,
         onContinue = viewModel::continueOnboarding,
         modifier = modifier,
     )

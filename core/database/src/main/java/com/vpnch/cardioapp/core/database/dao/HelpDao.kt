@@ -3,8 +3,8 @@ package com.vpnch.cardioapp.core.database.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
-import com.vpnch.cardioapp.core.database.entity.FaqEntity
-import com.vpnch.cardioapp.core.database.entity.HelpContactEntity
+import com.vpnch.cardioapp.core.database.entity.help.FaqEntity
+import com.vpnch.cardioapp.core.database.entity.help.HelpContactEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

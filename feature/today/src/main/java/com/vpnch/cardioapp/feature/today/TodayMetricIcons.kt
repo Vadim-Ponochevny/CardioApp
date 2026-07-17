@@ -1,18 +1,18 @@
 package com.vpnch.cardioapp.feature.today
 
 import androidx.annotation.DrawableRes
-import com.vpnch.cardioapp.feature.today.R
+import com.vpnch.cardioapp.core.ui.R as CoreUiR
 
 object TodayMetricIcons {
     @DrawableRes
-    val BLOOD_PRESSURE: Int = R.drawable.pressure
+    val BLOOD_PRESSURE: Int = CoreUiR.drawable.ic_metric_pressure
 
     @DrawableRes
-    val RESPIRATORY: Int = R.drawable.breath
+    val RESPIRATORY: Int = CoreUiR.drawable.ic_metric_breath
 
     @DrawableRes
-    val HEART_RATE: Int = R.drawable.pulse
+    val HEART_RATE: Int = CoreUiR.drawable.ic_metric_pulse
 
     @DrawableRes
-    val OXYGEN: Int = R.drawable.o2
+    val OXYGEN: Int = CoreUiR.drawable.ic_metric_o2
 }

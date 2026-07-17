@@ -4,11 +4,11 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
-import com.vpnch.cardioapp.core.database.entity.VitaminEntity
-import com.vpnch.cardioapp.core.database.entity.VitaminIntakeDayEntity
-import com.vpnch.cardioapp.core.database.entity.VitaminIntakeEntity
-import com.vpnch.cardioapp.core.database.model.TakenVitaminHistoryRow
-import com.vpnch.cardioapp.core.database.model.VitaminIntakeSummaryEntity
+import com.vpnch.cardioapp.core.database.entity.vitamins.VitaminEntity
+import com.vpnch.cardioapp.core.database.entity.vitamins.VitaminIntakeDayEntity
+import com.vpnch.cardioapp.core.database.entity.vitamins.VitaminIntakeEntity
+import com.vpnch.cardioapp.core.database.projection.TakenVitaminHistoryRow
+import com.vpnch.cardioapp.core.database.projection.VitaminIntakeSummaryEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -33,6 +33,15 @@ interface VitaminDao {
 
     @Upsert
     suspend fun upsertIntake(intake: VitaminIntakeEntity)
+
+    @Transaction
+    suspend fun upsertIntakeDayAndIntake(
+        intakeDay: VitaminIntakeDayEntity,
+        intake: VitaminIntakeEntity,
+    ) {
+        upsertIntakeDay(intakeDay)
+        upsertIntake(intake)
+    }
 
     @Transaction
     @Query(

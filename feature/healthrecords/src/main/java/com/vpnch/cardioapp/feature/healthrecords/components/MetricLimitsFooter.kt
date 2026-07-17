@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -15,24 +13,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.vpnch.cardioapp.core.model.health.metrics.MetricStatus
 import com.vpnch.cardioapp.core.ui.CardioPreview
+import com.vpnch.cardioapp.core.ui.MetricAlertBadge
 import com.vpnch.cardioapp.core.ui.theme.CardioTheme
-import com.vpnch.cardioapp.feature.healthrecords.create.FieldWarning
-import com.vpnch.cardioapp.feature.healthrecords.create.isCritical
 
 private const val LIMIT_WARNING_MESSAGE =
     "Если замер не попал в эти ожидания — позвони доктору и он расскажет что делать."
+
+private val CARD_CORNER_RADIUS = 20.dp
+private val CARD_CONTENT_PADDING = 16.dp
+private val CARD_CONTENT_SPACING = 12.dp
+private val ROW_SPACING = 12.dp
 
 @Composable
 fun MetricLimitsFooter(
     modifier: Modifier = Modifier,
     showWarning: Boolean,
-    warning: FieldWarning? = null,
+    warning: MetricStatus? = null,
 ) {
     if (!showWarning) return
 
     MetricLimitWarningCard(
-        isCritical = warning?.isCritical == true,
+        isCritical = warning == MetricStatus.DoctorSoon,
         modifier = modifier,
     )
 }
@@ -44,7 +47,7 @@ private fun MetricLimitWarningCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(CARD_CORNER_RADIUS),
         colors = CardDefaults.cardColors(
             containerColor = CardioTheme.colors.onPrimary,
         ),
@@ -52,13 +55,12 @@ private fun MetricLimitWarningCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+                .padding(CARD_CONTENT_PADDING),
+            verticalArrangement = Arrangement.spacedBy(CARD_CONTENT_SPACING),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(ROW_SPACING),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 MetricAlertBadge(isCritical = isCritical)
@@ -77,6 +79,6 @@ private fun MetricLimitWarningCard(
 private fun MetricLimitsFooterPreview() {
     MetricLimitsFooter(
         showWarning = true,
-        warning = FieldWarning.Critical,
+        warning = MetricStatus.DoctorSoon,
     )
 }

@@ -1,8 +1,8 @@
-package com.vpnch.cardioapp.feature.today
+﻿package com.vpnch.cardioapp.feature.today
 
 import androidx.annotation.DrawableRes
-import com.vpnch.cardioapp.core.model.SurveyLink
-import com.vpnch.cardioapp.core.model.VitaminIntakeSummary
+import com.vpnch.cardioapp.core.model.survey.SurveyLink
+import com.vpnch.cardioapp.core.model.vitamins.VitaminIntakeSummary
 
 data class TodayUiState(
     val isLoading: Boolean = true,

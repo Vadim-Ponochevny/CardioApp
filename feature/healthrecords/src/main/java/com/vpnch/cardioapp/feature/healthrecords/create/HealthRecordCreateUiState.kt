@@ -1,31 +1,22 @@
 package com.vpnch.cardioapp.feature.healthrecords.create
 
-enum class HealthRecordCreatePage(val title: String) {
-    BloodPressure("Давление"),
-    RespiratoryRate("Дыхание"),
-    HeartRate("Пульс"),
-    OxygenSaturation("Кислород"),
-}
-
-enum class FieldWarning {
-    Attention,
-    Critical,
-}
-
-val FieldWarning.isCritical: Boolean
-    get() = this == FieldWarning.Critical
+import com.vpnch.cardioapp.core.model.health.metrics.MetricStatus
+import com.vpnch.cardioapp.feature.healthrecords.create.model.HealthRecordCreatePage
 
 data class HealthRecordCreateUiState(
-    val currentPage: Int = 0,
+    val currentPage: HealthRecordCreatePage = HealthRecordCreatePage.BloodPressure,
     val systolicInput: String = "",
     val diastolicInput: String = "",
     val respiratoryInput: String = "",
     val heartRateInput: String = "",
     val oxygenInput: String = "",
-    val bloodPressureWarning: FieldWarning? = null,
-    val respiratoryWarning: FieldWarning? = null,
-    val heartRateWarning: FieldWarning? = null,
-    val oxygenWarning: FieldWarning? = null,
+    val inrInput: String = "",
+    val showInrPage: Boolean = false,
+    val bloodPressureWarning: MetricStatus? = null,
+    val respiratoryWarning: MetricStatus? = null,
+    val heartRateWarning: MetricStatus? = null,
+    val oxygenWarning: MetricStatus? = null,
+    val inrWarning: MetricStatus? = null,
     val systolicPlaceholder: String = "",
     val diastolicPlaceholder: String = "",
     val metricPlaceholder: String = "",
@@ -37,11 +28,17 @@ data class HealthRecordCreateUiState(
     val canProceed: Boolean = false,
     val primaryButtonLabel: String = "Далее",
 ) {
-    val pageCount: Int = HealthRecordCreatePage.entries.size
+    val availablePages: List<HealthRecordCreatePage>
+        get() = if (showInrPage) HealthRecordCreatePage.entries
+                else HealthRecordCreatePage.entries.filter { it != HealthRecordCreatePage.INR }
+
+    val pageCount: Int get() = availablePages.size
+    val lastPageIndex: Int get() = pageCount - 1
 
     val progressLabel: String
-        get() = "${currentPage + 1} из $pageCount"
+        get() = "${availablePages.indexOf(currentPage) + 1} из $pageCount"
 
     val currentTitle: String
-        get() = HealthRecordCreatePage.entries[currentPage].title
+        get() = currentPage.title
 }
+
