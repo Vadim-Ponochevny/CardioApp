@@ -88,7 +88,7 @@ fun AddVitaminDialog(
                 ) {
                     BasicTextField(
                         value = name,
-                        onValueChange = { name = it },
+                        onValueChange = { name = it.replaceFirstChar { c -> if (c.isLowerCase()) c.uppercaseChar() else c } },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = INPUT_HORIZONTAL_PADDING),

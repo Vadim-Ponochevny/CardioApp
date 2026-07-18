@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Text
@@ -25,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.vpnch.cardioapp.core.model.patient.AgeGroup
 import com.vpnch.cardioapp.core.ui.theme.CardioTheme
 
-private val DROPDOWN_HEIGHT = 88.dp
+private val DROPDOWN_HEIGHT = 60.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,12 +50,12 @@ internal fun AgeGroupDropdown(
                 .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                 .fillMaxWidth()
                 .height(DROPDOWN_HEIGHT)
-                .border(4.dp, CardioTheme.colors.textDisabled, ProfileCardShape),
+                .border(3.dp, CardioTheme.colors.textDisabled, ProfileCardShape),
             contentAlignment = Alignment.CenterStart,
         ) {
             Text(
                 text = displayLabel,
-                style = CardioTheme.typography.inputValue.copy(color = CardioTheme.colors.textMain),
+                style = CardioTheme.typography.bodySmall.copy(color = CardioTheme.colors.textMain),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 20.dp, end = 52.dp),
@@ -69,11 +70,16 @@ internal fun AgeGroupDropdown(
                 tint = CardioTheme.colors.textMain,
             )
         }
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            containerColor = CardioTheme.colors.onPrimary,
+        ) {
             selectableGroups.forEach { group ->
                 DropdownMenuItem(
                     text = { Text(group.label, style = CardioTheme.typography.bodySmall) },
                     onClick = { onSelect(group); expanded = false },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                 )
             }
         }

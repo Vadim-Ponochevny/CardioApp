@@ -42,6 +42,7 @@ class ProfileViewModel @Inject constructor(
                 mapToEditState(limits.singleMetricLimits, limits.bloodPressureLimits)
             }
             val notificationsEnabled = patientRepository.getNotificationsEnabled()
+            if (notificationsEnabled) notificationScheduler.schedule()
             _uiState.update {
                 ProfileUiState(
                     isLoading = false,

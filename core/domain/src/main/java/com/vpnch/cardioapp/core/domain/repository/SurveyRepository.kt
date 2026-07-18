@@ -5,4 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface SurveyRepository {
     fun observeActiveSurveyLink(): Flow<SurveyLink?>
+    suspend fun getCurrentSurveyId(): String?
+    suspend fun markSurveyOpened(surveyId: String)
 }

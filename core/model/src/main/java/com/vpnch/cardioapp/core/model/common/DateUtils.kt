@@ -74,12 +74,18 @@ object DateUtils {
     fun formatTime(timestamp: Long): String = timeFormat.format(Date(timestamp))
 
     /**
-     * Counts consecutive days ending today that have at least one record.
-     * Returns 0 if today has no records.
+     * Counts consecutive days with records, ending at today or yesterday.
+     * If today has no records yet, starts counting from yesterday so the
+     * streak doesn't reset to 0 mid-day.
      */
     fun calculateStreak(dateKeys: Set<String>): Int {
         if (dateKeys.isEmpty()) return 0
         val cal = Calendar.getInstance()
+        val todayKey = dateKeyFormat.format(cal.time)
+        // If no record today, start counting from yesterday
+        if (!dateKeys.contains(todayKey)) {
+            cal.add(Calendar.DAY_OF_YEAR, -1)
+        }
         var streak = 0
         while (true) {
             val key = dateKeyFormat.format(cal.time)

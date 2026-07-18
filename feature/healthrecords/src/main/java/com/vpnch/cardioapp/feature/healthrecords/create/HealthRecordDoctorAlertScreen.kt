@@ -1,28 +1,40 @@
 package com.vpnch.cardioapp.feature.healthrecords.create
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.vpnch.cardioapp.core.ui.CardioPreview
+import com.vpnch.cardioapp.core.ui.theme.CardioTheme
+import com.vpnch.cardioapp.feature.healthrecords.R
 
 private const val TEXT_ALERT_MESSAGE =
     "Очень важно время от времени показать наши цифры доктору. Пришло время позвонить."
 private const val BTN_OPEN_CONTACTS = "Открыть номера"
 private const val BTN_HOME = "На главный экран"
 
-private val SCREEN_CONTENT_PADDING = 24.dp
-private val FIRST_BUTTON_TOP_PADDING = 32.dp
+private val SCREEN_PADDING_H = 16.dp
+private val SCREEN_PADDING_V = 24.dp
+private val TEXT_PADDING_H = 32.dp
+private val IMAGE_HEIGHT = 240.dp
+private val BUTTON_HEIGHT = 72.dp
+private val BUTTON_CORNER = 36.dp
 private val BUTTON_SPACING = 12.dp
 
 @Composable
@@ -34,30 +46,62 @@ fun HealthRecordDoctorAlertScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(SCREEN_CONTENT_PADDING),
-        verticalArrangement = Arrangement.Center,
+            .padding(horizontal = SCREEN_PADDING_H)
+            .padding(vertical = SCREEN_PADDING_V),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            text = TEXT_ALERT_MESSAGE,
-            style = MaterialTheme.typography.headlineSmall,
-            textAlign = TextAlign.Center,
-        )
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Image(
+                painter = painterResource(R.drawable.doctor_warning),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IMAGE_HEIGHT),
+            )
+            Spacer(Modifier.height(24.dp))
+            Text(
+                text = TEXT_ALERT_MESSAGE,
+                style = CardioTheme.typography.navLabel,
+                color = CardioTheme.colors.textSecondary,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = TEXT_PADDING_H),
+            )
+        }
+
         Button(
             onClick = onOpenHelp,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = FIRST_BUTTON_TOP_PADDING),
+                .height(BUTTON_HEIGHT),
+            shape = RoundedCornerShape(BUTTON_CORNER),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = CardioTheme.colors.primary,
+                contentColor = CardioTheme.colors.onPrimary,
+            ),
         ) {
-            Text(BTN_OPEN_CONTACTS)
+            Text(
+                text = BTN_OPEN_CONTACTS,
+                style = CardioTheme.typography.actionLabel,
+            )
         }
+        Spacer(Modifier.height(BUTTON_SPACING))
         OutlinedButton(
             onClick = onFinish,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = BUTTON_SPACING),
+                .height(BUTTON_HEIGHT),
+            shape = RoundedCornerShape(BUTTON_CORNER),
         ) {
-            Text(BTN_HOME)
+            Text(
+                text = BTN_HOME,
+                style = CardioTheme.typography.actionLabel,
+                color = CardioTheme.colors.textMain,
+            )
         }
     }
 }

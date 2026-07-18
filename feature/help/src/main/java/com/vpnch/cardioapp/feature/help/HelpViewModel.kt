@@ -12,11 +12,12 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class HelpViewModel @Inject constructor(
     helpRepository: HelpRepository,
-    surveyRepository: SurveyRepository,
+    private val surveyRepository: SurveyRepository,
     private val analytics: Analytics,
 ) : ViewModel() {
 
@@ -27,6 +28,8 @@ class HelpViewModel @Inject constructor(
         HelpUiState(
             contacts = contacts,
             surveyUrl = surveyLink?.url,
+            surveyId = surveyLink?.id,
+            surveyIsNew = surveyLink?.isNew ?: false,
             isLoading = false,
         )
     }.stateIn(
@@ -39,13 +42,18 @@ class HelpViewModel @Inject constructor(
         analytics.report(AnalyticsEvent.CallButtonPressed)
     }
 
-    fun onSurveyOpened() {
+    fun onSurveyOpened(surveyId: String) {
         analytics.report(AnalyticsEvent.QuestionnaireOpened)
+        viewModelScope.launch {
+            surveyRepository.markSurveyOpened(surveyId)
+        }
     }
 }
 
 data class HelpUiState(
     val contacts: List<HelpContact> = emptyList(),
     val surveyUrl: String? = null,
+    val surveyId: String? = null,
+    val surveyIsNew: Boolean = false,
     val isLoading: Boolean = true,
 )

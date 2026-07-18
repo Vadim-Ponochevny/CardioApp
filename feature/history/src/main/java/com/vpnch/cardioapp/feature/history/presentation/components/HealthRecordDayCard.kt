@@ -45,9 +45,9 @@ private val ARROW_ICON_SIZE = 24.dp
 private const val MAX_DOTS_VISIBLE = 8
 
 private val ColorDivider = Color(0xFFE0E0E0)
-private val ColorDotOk = Color(0xFF2E9B3D)
-private val ColorDotWarning = Color(0xFFFEC81A)
-private val ColorDotCritical = Color(0xFFE53935)
+private val ColorDotOk = Color(0xFF81C784)
+private val ColorDotWarning = Color(0xFFFFD54F)
+private val ColorDotCritical = Color(0xFFE57373)
 
 @Composable
 fun HealthRecordDayCard(

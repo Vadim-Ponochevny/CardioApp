@@ -17,18 +17,19 @@ import com.vpnch.cardioapp.core.model.health.formatBloodPressure
 import com.vpnch.cardioapp.core.model.health.isOutOfNorm
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class TodayViewModel @Inject constructor(
     patientRepository: PatientRepository,
@@ -41,22 +42,22 @@ class TodayViewModel @Inject constructor(
 
     private val today = currentDate()
     private val patient = patientRepository.currentPatient
-    private val limitsBundle = MutableStateFlow<MetricLimitsBundle?>(null)
 
-    init {
-        viewModelScope.launch {
-            val currentPatient = patientRepository.getCurrentPatient() ?: return@launch
-            val limitsAgeGroup = if (currentPatient.useCustomLimits) AgeGroup.Custom else currentPatient.ageGroup
-            limitsBundle.value = MetricLimitsBundle(
-                singleLimits = healthRecordRepository
-                    .getSingleMetricLimits(limitsAgeGroup)
-                    .associateBy { it.metricType },
-                bloodPressureLimits = healthRecordRepository.getBloodPressureLimits(limitsAgeGroup),
+    private val limitsBundle = patient.flatMapLatest { p ->
+        if (p == null) flowOf<MetricLimitsBundle?>(null)
+        else flow {
+            val ageGroup = if (p.useCustomLimits) AgeGroup.Custom else p.ageGroup
+            emit(
+                MetricLimitsBundle(
+                    singleLimits = healthRecordRepository
+                        .getSingleMetricLimits(ageGroup)
+                        .associateBy { it.metricType },
+                    bloodPressureLimits = healthRecordRepository.getBloodPressureLimits(ageGroup),
+                )
             )
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     val uiState = combine(
         patient.flatMapLatest { currentPatient ->
             currentPatient?.let {

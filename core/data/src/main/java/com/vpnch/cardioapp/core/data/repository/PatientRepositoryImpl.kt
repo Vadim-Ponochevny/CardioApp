@@ -58,7 +58,7 @@ class PatientRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getNotificationsEnabled(): Boolean {
-        return dataStore.data.first()[NOTIFICATIONS_ENABLED] ?: false
+        return dataStore.data.first()[NOTIFICATIONS_ENABLED] ?: true
     }
 
     override suspend fun setNotificationsEnabled(enabled: Boolean) {

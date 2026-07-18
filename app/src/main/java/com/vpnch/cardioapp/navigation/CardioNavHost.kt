@@ -46,6 +46,7 @@ import com.vpnch.cardioapp.navigation.CardioDestinations.HEALTH_RECORD_DETAIL_AR
 @Composable
 fun CardioNavHost(
     modifier: Modifier = Modifier,
+    initialRoute: String? = null,
     navController: NavHostController = rememberNavController(),
 ) {
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
@@ -55,6 +56,15 @@ fun CardioNavHost(
     LaunchedEffect(Unit) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+        if (initialRoute != null) {
+            navController.navigate(initialRoute) {
+                popUpTo(navController.graph.findStartDestination().id) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            }
         }
     }
 

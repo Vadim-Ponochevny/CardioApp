@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vpnch.cardioapp.core.ui.theme.CardioTheme
 
-private val ICON_SIZE = 32.dp
+private val ICON_SIZE = 36.dp
 private val ITEM_VERTICAL_SPACING = 4.dp
 private val DIVIDER_PADDING = 8.dp
 private val ColorDivider = Color(0xFFE0E0E0)

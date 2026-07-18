@@ -1,4 +1,4 @@
-﻿package com.vpnch.cardioapp.feature.today
+package com.vpnch.cardioapp.feature.today
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,6 +35,15 @@ import com.vpnch.cardioapp.feature.today.components.HealthRecordsCard
 import com.vpnch.cardioapp.feature.today.components.VitaminsSection
 import java.util.Calendar
 
+private val SCREEN_HORIZONTAL_PADDING = 12.dp
+private val SCREEN_TOP_PADDING = 12.dp
+private val SECTION_SPACING = 16.dp
+private val ADD_BUTTON_HEIGHT = 68.dp
+private val ADD_BUTTON_CORNER = 36.dp
+private val ADD_BUTTON_ICON_SPACING = 18.dp
+private val ADD_BUTTON_ICON_SIZE = 26.dp
+private val PROFILE_ICON_SIZE = 28.dp
+
 @Composable
 fun TodayScreen(
     uiState: TodayUiState,
@@ -60,10 +69,10 @@ fun TodayScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 12.dp) // отступы только слева и справа
-            .padding(top = 12.dp)
+            .padding(horizontal = SCREEN_HORIZONTAL_PADDING)
+            .padding(top = SCREEN_TOP_PADDING)
             .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(SECTION_SPACING),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -86,7 +95,7 @@ fun TodayScreen(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_profile),
                     contentDescription = "Профиль",
-                    modifier = Modifier.size(28.dp),
+                    modifier = Modifier.size(PROFILE_ICON_SIZE),
                     tint = CardioTheme.colors.textSecondary,
                 )
             }
@@ -99,27 +108,27 @@ fun TodayScreen(
 
         Button(
             onClick = onAddHealthRecord,
-            modifier = Modifier.fillMaxWidth().height(88.dp),
-            shape = RoundedCornerShape(36.dp),
+            modifier = Modifier.fillMaxWidth().height(ADD_BUTTON_HEIGHT),
+            shape = RoundedCornerShape(ADD_BUTTON_CORNER),
             colors = ButtonDefaults.buttonColors(
                 containerColor = CardioTheme.colors.primary,
                 contentColor = CardioTheme.colors.onPrimary,
             ),
         ) {
             Row(
-                horizontalArrangement = Arrangement.Center, // центр по горизонтали
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
-                    text = "Новая запись",
-                    style = CardioTheme.typography.actionLabel,
+                    text = "Создать запись",
+                    style = CardioTheme.typography.itemTitle,
                 )
-                Spacer(modifier = Modifier.width(18.dp))
+                Spacer(modifier = Modifier.width(ADD_BUTTON_ICON_SPACING))
                 Icon(
                     painter = painterResource(id = R.drawable.plus1),
                     contentDescription = "Добавить",
-                    modifier = Modifier.size(26.dp)
+                    modifier = Modifier.size(ADD_BUTTON_ICON_SIZE),
                 )
             }
         }
@@ -130,6 +139,8 @@ fun TodayScreen(
             onOpenVitamins = onOpenVitamins,
         )
 
+        Spacer(modifier = Modifier.height(24.dp))
+
 //        SurveyCard(
 //            surveyLink = uiState.surveyLink,
 //            onOpenSurvey = onOpenSurvey,
@@ -137,23 +148,19 @@ fun TodayScreen(
     }
 }
 
-@Composable
-fun getFormattedDate(): String {
+private fun getFormattedDate(): String {
     val calendar = Calendar.getInstance()
     val day = calendar.get(Calendar.DAY_OF_MONTH)
-
     val months = arrayOf(
         "января", "февраля", "марта", "апреля", "мая", "июня",
-        "июля", "августа", "сентября", "октября", "ноября", "декабря"
+        "июля", "августа", "сентября", "октября", "ноября", "декабря",
     )
-    val month = months[calendar.get(Calendar.MONTH)]
-
     val weekdays = arrayOf(
         "воскресенье", "понедельник", "вторник", "среда",
-        "четверг", "пятница", "суббота"
+        "четверг", "пятница", "суббота",
     )
+    val month = months[calendar.get(Calendar.MONTH)]
     val weekday = weekdays[calendar.get(Calendar.DAY_OF_WEEK) - 1]
-
     return "$day $month, $weekday"
 }
 
@@ -161,69 +168,42 @@ fun getFormattedDate(): String {
 @Composable
 private fun TodayScreenPreview() {
     CardioPreviewTheme {
-        TodayScreenPreviewContent()
+        TodayScreen(
+            uiState = TodayUiState(
+                isLoading = false,
+                latestRecord = LatestHealthRecordSummary(
+                    recordId = "record-1",
+                    timeLabel = "17:00",
+                    hasOutOfNorm = true,
+                    hasCritical = true,
+                    metrics = listOf(
+                        TodayMetricItem("Давление", "110/80", TodayMetricIcons.BLOOD_PRESSURE, false),
+                        TodayMetricItem("Дыхание", "18", TodayMetricIcons.RESPIRATORY, false),
+                        TodayMetricItem("Пульс", "90", TodayMetricIcons.HEART_RATE, true),
+                        TodayMetricItem("Кислород", "98", TodayMetricIcons.OXYGEN, false),
+                    ),
+                ),
+                vitaminIntakes = listOf(
+                    VitaminIntakeSummary(
+                        vitamin = Vitamin(id = "v1", patientId = "p", name = "Витаминка утром", dose = "1 шт."),
+                        intake = VitaminIntake(id = "i1", intakeDayId = "day", vitaminId = "v1", isTaken = true, takenAt = 0L, updatedAt = 0L),
+                    ),
+                    VitaminIntakeSummary(
+                        vitamin = Vitamin(id = "v2", patientId = "p", name = "Витаминка вечером", dose = "1 шт."),
+                        intake = null,
+                    ),
+                ),
+                surveyLink = SurveyLink(
+                    id = "survey", title = "Опрос", url = "https://forms.yandex.ru/",
+                    isActive = true, createdAt = 0L, updatedAt = 0L,
+                ),
+            ),
+            onOpenLatestRecord = {},
+            onAddHealthRecord = {},
+            onOpenProfile = {},
+            onOpenSurvey = {},
+            onVitaminCheckedChange = { _, _ -> },
+            onOpenVitamins = {},
+        )
     }
 }
-
-@Composable
-private fun TodayScreenPreviewContent() {
-    TodayScreen(
-        uiState = TodayUiState(
-            isLoading = false,
-            latestRecord = LatestHealthRecordSummary(
-                recordId = "record-1",
-                timeLabel = "17:00",
-                hasOutOfNorm = true,
-                hasCritical = true,
-                metrics = listOf(
-                    TodayMetricItem("Давление", "110/80", TodayMetricIcons.BLOOD_PRESSURE, false),
-                    TodayMetricItem("Дыхание", "18", TodayMetricIcons.RESPIRATORY, false),
-                    TodayMetricItem("Пульс", "90", TodayMetricIcons.HEART_RATE, true),
-                    TodayMetricItem("Кислород", "98", TodayMetricIcons.OXYGEN, false),
-                ),
-            ),
-            vitaminIntakes = listOf(
-                VitaminIntakeSummary(
-                    vitamin = Vitamin(
-                        id = "vitamin-1",
-                        patientId = "patient",
-                        name = "Витаминка утром",
-                        dose = "1 шт.",
-                    ),
-                    intake = VitaminIntake(
-                        id = "intake-1",
-                        intakeDayId = "day",
-                        vitaminId = "vitamin-1",
-                        isTaken = true,
-                        takenAt = 0L,
-                        updatedAt = 0L,
-                    ),
-                ),
-                VitaminIntakeSummary(
-                    vitamin = Vitamin(
-                        id = "vitamin-2",
-                        patientId = "patient",
-                        name = "Витаминка вечером",
-                        dose = "1 шт.",
-                    ),
-                    intake = null,
-                ),
-            ),
-            surveyLink = SurveyLink(
-                id = "survey",
-                title = "Опрос",
-                url = "https://forms.yandex.ru/",
-                isActive = true,
-                createdAt = 0L,
-                updatedAt = 0L,
-            ),
-        ),
-        onOpenLatestRecord = {},
-        onAddHealthRecord = {},
-        onOpenProfile = {},
-        onOpenSurvey = {},
-        onVitaminCheckedChange = { _, _ -> },
-        onOpenVitamins = {},
-    )
-}
-

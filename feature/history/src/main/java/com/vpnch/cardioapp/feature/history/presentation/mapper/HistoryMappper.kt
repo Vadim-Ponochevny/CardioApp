@@ -45,7 +45,7 @@ class HistoryMapper @Inject constructor(
             .map { (dateKey, items) ->
                 VitaminHistorySection(
                     dateKey = dateKey,
-                    label = formatDayNumber(dateKey),
+                    label = "${formatDayNumber(dateKey)} ${formatMonthShort(dateKey)}",
                     vitamins = items.map { VitaminHistoryItem(it.vitaminId, it.vitaminName) },
                 )
             }

@@ -54,13 +54,13 @@ fun StreakBanner(
                 .padding(horizontal = BANNER_HORIZONTAL_PADDING, vertical = BANNER_VERTICAL_PADDING),
         ) {
             Text(
-                text = "$streakDays",
+                text = "$streakDays ${streakDays.daysWord()}",
                 color = ColorTextOnPrimary,
                 fontSize = CountTextSize,
                 style = CardioTheme.typography.cardTitle,
             )
             Text(
-                text = "Дней без пропусков",
+                text = "Без пропусков",
                 color = ColorTextOnPrimary.copy(alpha = 0.85f),
                 fontSize = LabelTextSize,
                 style = CardioTheme.typography.bodySmall,
@@ -78,4 +78,11 @@ fun StreakBanner(
                 .offset(x = DOCTOR_IMAGE_OFFSET_X),
         )
     }
+}
+
+private fun Int.daysWord(): String = when {
+    this % 100 in 11..19 -> "дней"
+    this % 10 == 1 -> "день"
+    this % 10 in 2..4 -> "дня"
+    else -> "дней"
 }

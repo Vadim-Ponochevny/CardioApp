@@ -13,4 +13,6 @@ sealed class AnalyticsEvent(val name: String) {
     data object QuestionnaireCompleted : AnalyticsEvent("questionnaire_completed")
     data object AbnormalValueDetected : AnalyticsEvent("abnormal_value_detected")
     data object CallButtonPressed : AnalyticsEvent("call_button_pressed")
+    data object OpenedFromDailyNotification : AnalyticsEvent("opened_from_daily_notification")
+    data object OpenedFromSurveyNotification : AnalyticsEvent("opened_from_survey_notification")
 }

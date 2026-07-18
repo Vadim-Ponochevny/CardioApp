@@ -42,11 +42,8 @@ fun HealthRecordDetailScreen(
             .background(CardioTheme.colors.background),
     ) {
         CardioTopBar(
-            title = if (uiState.timeLabel.isNotEmpty()) {
-                "$TITLE_RECORD ${uiState.timeLabel}"
-            } else {
-                TITLE_RECORD
-            },
+            title = TITLE_RECORD,
+            subtitle = uiState.timeLabel.ifEmpty { null },
             onBack = onBack,
         )
 

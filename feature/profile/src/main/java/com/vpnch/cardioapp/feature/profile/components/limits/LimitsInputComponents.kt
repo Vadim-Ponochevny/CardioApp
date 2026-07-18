@@ -14,6 +14,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,7 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.vpnch.cardioapp.core.ui.theme.CardioTheme
 
@@ -72,6 +75,15 @@ private fun LimitsNumberField(
     modifier: Modifier = Modifier,
 ) {
     var isFocused by remember { mutableStateOf(false) }
+    var tfState by remember { mutableStateOf(TextFieldValue(value, TextRange(value.length))) }
+
+    // Sync when external value changes (e.g., step navigation or initial load)
+    LaunchedEffect(value) {
+        if (tfState.text != value) {
+            tfState = TextFieldValue(value, TextRange(value.length))
+        }
+    }
+
     val strokeColor = if (isFocused) CardioTheme.colors.textMain else CardioTheme.colors.onPrimary
 
     Box(
@@ -83,12 +95,17 @@ private fun LimitsNumberField(
         contentAlignment = Alignment.CenterStart,
     ) {
         BasicTextField(
-            value = value,
-            onValueChange = { input ->
-                if (allowDecimal) {
-                    if (input.matches(Regex("""^\d*\.?\d*$"""))) onValueChange(input)
+            value = tfState,
+            onValueChange = { newTfValue ->
+                val input = newTfValue.text
+                val isValid = if (allowDecimal) {
+                    input.matches(Regex("""^\d*\.?\d*$"""))
                 } else {
-                    if (input.all { it.isDigit() }) onValueChange(input)
+                    input.isEmpty() || input.all { it.isDigit() }
+                }
+                if (isValid) {
+                    tfState = newTfValue
+                    onValueChange(input)
                 }
             },
             modifier = Modifier
@@ -100,13 +117,15 @@ private fun LimitsNumberField(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             cursorBrush = SolidColor(CardioTheme.colors.textMain),
             decorationBox = { innerTextField ->
-                if (value.isEmpty() && !isFocused) {
-                    Text(
-                        text = "0",
-                        style = CardioTheme.typography.inputValue.copy(color = CardioTheme.colors.textDisabled),
-                    )
+                Box(contentAlignment = Alignment.CenterStart) {
+                    if (tfState.text.isEmpty() && !isFocused) {
+                        Text(
+                            text = "0",
+                            style = CardioTheme.typography.inputValue.copy(color = CardioTheme.colors.textDisabled),
+                        )
+                    }
+                    innerTextField()
                 }
-                innerTextField()
             },
         )
     }

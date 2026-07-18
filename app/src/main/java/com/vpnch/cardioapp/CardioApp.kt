@@ -11,6 +11,7 @@ import com.vpnch.cardioapp.navigation.CardioNavHost
 @Composable
 fun CardioApp(
     modifier: Modifier = Modifier,
+    initialRoute: String? = null,
 ) {
     val viewModel: CardioAppViewModel = hiltViewModel()
     val isProfileComplete by viewModel.isProfileComplete.collectAsState(initial = null)
@@ -21,6 +22,9 @@ fun CardioApp(
             onComplete = { /* recomposition triggers automatically */ },
             modifier = modifier,
         )
-        true -> CardioNavHost(modifier = modifier)
+        true -> CardioNavHost(
+            initialRoute = initialRoute,
+            modifier = modifier,
+        )
     }
 }

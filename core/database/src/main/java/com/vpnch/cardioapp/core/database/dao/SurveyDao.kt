@@ -11,6 +11,9 @@ interface SurveyDao {
     @Query("SELECT * FROM survey_links WHERE isActive = 1 ORDER BY updatedAt DESC LIMIT 1")
     fun observeActiveSurveyLink(): Flow<SurveyLinkEntity?>
 
+    @Query("SELECT id FROM survey_links WHERE isActive = 1 ORDER BY updatedAt DESC LIMIT 1")
+    suspend fun getActiveSurveyId(): String?
+
     @Upsert
     suspend fun upsertSurveyLink(surveyLink: SurveyLinkEntity)
 }

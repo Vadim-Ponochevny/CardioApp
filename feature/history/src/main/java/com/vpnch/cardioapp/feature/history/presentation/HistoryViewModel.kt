@@ -11,14 +11,14 @@ import com.vpnch.cardioapp.feature.history.presentation.mapper.HistoryMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
     patientRepository: PatientRepository,
@@ -28,22 +28,22 @@ class HistoryViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val patient = patientRepository.currentPatient
-    private val limitsBundle = MutableStateFlow<MetricLimitsBundle?>(null)
 
-    init {
-        viewModelScope.launch {
-            val patient = patientRepository.getCurrentPatient() ?: return@launch
-            val ageGroup = if (patient.useCustomLimits) AgeGroup.Custom else patient.ageGroup
-            limitsBundle.value = MetricLimitsBundle(
-                singleLimits = healthRecordRepository
-                    .getSingleMetricLimits(ageGroup)
-                    .associateBy { it.metricType },
-                bloodPressureLimits = healthRecordRepository.getBloodPressureLimits(ageGroup),
+    private val limitsBundle = patient.flatMapLatest { p ->
+        if (p == null) flowOf<MetricLimitsBundle?>(null)
+        else flow {
+            val ageGroup = if (p.useCustomLimits) AgeGroup.Custom else p.ageGroup
+            emit(
+                MetricLimitsBundle(
+                    singleLimits = healthRecordRepository
+                        .getSingleMetricLimits(ageGroup)
+                        .associateBy { it.metricType },
+                    bloodPressureLimits = healthRecordRepository.getBloodPressureLimits(ageGroup),
+                )
             )
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     val uiState = patient.flatMapLatest { currentPatient ->
         if (currentPatient == null) {
             flowOf(Pair(emptyList(), emptyList()))

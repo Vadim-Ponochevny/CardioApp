@@ -1,9 +1,7 @@
 package com.vpnch.cardioapp.feature.today.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,11 +19,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.vpnch.cardioapp.core.ui.theme.CardioTheme
 import com.vpnch.cardioapp.core.model.health.MISSING_METRIC_LABEL
+import com.vpnch.cardioapp.core.ui.HealthMetricSummaryRow
+import com.vpnch.cardioapp.core.ui.MetricAlertBadge
+import com.vpnch.cardioapp.core.ui.MetricDisplayItem
+import com.vpnch.cardioapp.core.ui.theme.CardioTheme
 import com.vpnch.cardioapp.feature.today.LatestHealthRecordSummary
 import com.vpnch.cardioapp.feature.today.TodayMetricIcons
 import com.vpnch.cardioapp.feature.today.TodayMetricItem
+
+private val CARD_CORNER = 36.dp
+private val CARD_PADDING = 16.dp
+private val HEADER_BOTTOM_PADDING = 12.dp
+private val METRICS_TOP_PADDING = 24.dp
+private val METRICS_SPACING = 24.dp
+private val ARROW_SIZE = 44.dp
 
 @Composable
 fun HealthRecordsCard(
@@ -35,16 +43,12 @@ fun HealthRecordsCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(36.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = CardioTheme.colors.onPrimary,
-        ),
+        shape = RoundedCornerShape(CARD_CORNER),
+        colors = CardDefaults.cardColors(containerColor = CardioTheme.colors.onPrimary),
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-        ) {
+        Column(modifier = Modifier.padding(CARD_PADDING)) {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp, ),
+                modifier = Modifier.fillMaxWidth().padding(bottom = HEADER_BOTTOM_PADDING),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Row(
@@ -58,7 +62,7 @@ fun HealthRecordsCard(
                         color = CardioTheme.colors.textMain,
                     )
                     if (latestRecord?.hasOutOfNorm == true) {
-                        OutOfNormBadge(isCritical = latestRecord.hasCritical)
+                        MetricAlertBadge(isCritical = latestRecord.hasCritical)
                     }
                 }
                 if (latestRecord != null) {
@@ -67,29 +71,24 @@ fun HealthRecordsCard(
                         contentDescription = "Открыть запись",
                         tint = CardioTheme.colors.textMain,
                         modifier = Modifier
-                            .size(44.dp)
+                            .size(ARROW_SIZE)
                             .clickable { onOpenLatestRecord(latestRecord.recordId) },
                     )
                 }
             }
 
             Text(
-                text = if (latestRecord != null) {
-                    "Последняя запись в ${latestRecord.timeLabel}"
-                } else {
-                    "Записей пока нет"
-                },
+                text = if (latestRecord != null) "Последняя запись в ${latestRecord.timeLabel}"
+                       else "Записей пока нет",
                 style = CardioTheme.typography.navLabel,
                 color = CardioTheme.colors.textSecondary,
             )
 
-            Column(
-                modifier = Modifier.padding(top = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)) {
-                val metrics = latestRecord?.metrics ?: emptyMetricsPlaceholder()
-                MetricGridRow(metrics[0], metrics[1])
-                MetricGridRow(metrics[2], metrics[3])
-            }
+            val metrics = latestRecord?.metrics ?: emptyMetricsPlaceholder()
+            HealthMetricSummaryRow(
+                metrics = metrics.map { MetricDisplayItem(it.iconRes, it.value, it.title) },
+                modifier = Modifier.padding(top = METRICS_TOP_PADDING),
+            )
         }
     }
 }
@@ -100,59 +99,3 @@ private fun emptyMetricsPlaceholder(): List<TodayMetricItem> = listOf(
     TodayMetricItem("Пульс", MISSING_METRIC_LABEL, TodayMetricIcons.HEART_RATE, false),
     TodayMetricItem("Кислород", MISSING_METRIC_LABEL, TodayMetricIcons.OXYGEN, false),
 )
-
-@Composable
-private fun MetricGridRow(
-    first: TodayMetricItem?,
-    second: TodayMetricItem?,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        MetricCell(
-            metric = first,
-            modifier = Modifier.weight(1f),
-        )
-        MetricCell(
-            metric = second,
-            modifier = Modifier.weight(1f),
-        )
-    }
-}
-
-@Composable
-private fun MetricCell(
-    metric: TodayMetricItem?,
-    modifier: Modifier = Modifier,
-) {
-    if (metric == null) {
-        Box(modifier = modifier)
-        return
-    }
-
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Image(
-            painter = painterResource(id = metric.iconRes),
-            contentDescription = metric.title,
-            modifier = Modifier.size(52.dp),
-            // colorFilter = ColorFilter.tint(CardioTheme.colors.onPrimary) // если нужно перекрасить
-        )
-        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(
-                text = metric.value,
-                style = CardioTheme.typography.bodyMedium,
-                color = CardioTheme.colors.textMain,
-            )
-            Text(
-                text = metric.title,
-                style = CardioTheme.typography.navLabel,
-                color = CardioTheme.colors.textMain,
-            )
-        }
-    }
-}

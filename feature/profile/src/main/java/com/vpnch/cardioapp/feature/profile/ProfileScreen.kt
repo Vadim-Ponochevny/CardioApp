@@ -3,8 +3,11 @@
 package com.vpnch.cardioapp.feature.profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,12 +17,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -33,12 +38,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import com.vpnch.cardioapp.core.model.health.limits.BloodPressureLimits
 import com.vpnch.cardioapp.core.model.health.limits.SingleMetricLimits
 import com.vpnch.cardioapp.core.model.health.metrics.MetricType
 import com.vpnch.cardioapp.core.model.patient.AgeGroup
 import com.vpnch.cardioapp.core.model.patient.ValveType
+import com.vpnch.cardioapp.core.ui.CardioDialog
+import com.vpnch.cardioapp.core.ui.CardioDialogButton
 import com.vpnch.cardioapp.core.ui.CardioTopBar
 import com.vpnch.cardioapp.core.ui.theme.CardioTheme
 import com.vpnch.cardioapp.feature.profile.components.AgeGroupDropdown
@@ -55,9 +65,11 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
-private val SCREEN_BG_COLOR = androidx.compose.ui.graphics.Color(0xFFF6F6F6)
+private val SCREEN_BG_COLOR = Color(0xFFF6F6F6)
 private val CONTENT_HORIZONTAL_PADDING = 16.dp
 private val ITEM_SPACING = 12.dp
+private val INFO_BUTTON_SIZE = 24.dp
+private val COLOR_MANUAL_BUTTON = Color(0xFFE0E0E0)
 
 @Composable
 fun ProfileScreen(
@@ -73,7 +85,11 @@ fun ProfileScreen(
     onNotificationsEnabledChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val focusManager = LocalFocusManager.current
     var showDatePicker by remember { mutableStateOf(false) }
+    var showIdInfo by remember { mutableStateOf(false) }
+    var isIdLocked by remember { mutableStateOf(true) }
+
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = uiState.birthDate.parseToMillis(),
     )
@@ -90,19 +106,55 @@ fun ProfileScreen(
             dismissButton = {
                 TextButton(onClick = { showDatePicker = false }) { Text("Отмена") }
             },
-        ) { DatePicker(state = datePickerState) }
+            colors = DatePickerDefaults.colors(
+                containerColor = CardioTheme.colors.onPrimary,
+            ),
+        ) {
+            DatePicker(
+                state = datePickerState,
+                colors = DatePickerDefaults.colors(
+                    containerColor = CardioTheme.colors.onPrimary,
+                    selectedDayContainerColor = CardioTheme.colors.primary,
+                    todayDateBorderColor = CardioTheme.colors.primary,
+                    todayContentColor = CardioTheme.colors.primary,
+                    selectedYearContainerColor = CardioTheme.colors.primary,
+                ),
+            )
+        }
     }
 
-    Box(
+    if (showIdInfo) {
+        CardioDialog(
+            title = "ID пациента",
+            message = "Это уникальный идентификатор пациента. При смене ID все данные (записи, витаминки, лимиты) будут привязаны к новому профилю. Менять ID следует только намеренно — например, чтобы переключиться на другого пациента.",
+            primaryButton = CardioDialogButton(
+                label = "Понятно",
+                containerColor = CardioTheme.colors.primary,
+                contentColor = CardioTheme.colors.onPrimary,
+                onClick = { showIdInfo = false },
+            ),
+            secondaryButton = CardioDialogButton(
+                label = "Изменить ID",
+                containerColor = CardioTheme.colors.textDisabled,
+                contentColor = CardioTheme.colors.textMain,
+                onClick = { showIdInfo = false; isIdLocked = false },
+            ),
+            onDismiss = { showIdInfo = false },
+        )
+    }
+
+    Column(
         modifier = modifier
             .fillMaxSize()
             .background(SCREEN_BG_COLOR),
     ) {
+        CardioTopBar(title = "Профиль", onBack = onBack)
+
         if (uiState.isLoading) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
-            return@Box
+            return@Column
         }
 
         val metricDisplays = buildMetricDisplays(uiState)
@@ -111,45 +163,108 @@ fun ProfileScreen(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(ITEM_SPACING),
         ) {
-            item { CardioTopBar(title = "Профиль", onBack = onBack) }
-
             item { Spacer(Modifier.height(4.dp)) }
 
             item {
-                ProfileInputField(
-                    label = "ID пациента",
-                    value = uiState.patientId,
-                    onValueChange = onPatientIdChange,
-                    placeholder = "PT-7GZVL7PT",
-                    modifier = Modifier.padding(horizontal = CONTENT_HORIZONTAL_PADDING),
-                )
+                Column(modifier = Modifier.padding(horizontal = CONTENT_HORIZONTAL_PADDING)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(bottom = 8.dp),
+                    ) {
+                        Text(
+                            text = "ID пациента",
+                            style = CardioTheme.typography.bodySmall,
+                            color = CardioTheme.colors.textSecondary,
+                            modifier = Modifier.weight(1f),
+                        )
+                        Box(
+                            modifier = Modifier
+                                .size(INFO_BUTTON_SIZE)
+                                .clip(CircleShape)
+                                .background(CardioTheme.colors.textDisabled)
+                                .clickable { showIdInfo = true },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = "?",
+                                style = CardioTheme.typography.navLabel,
+                                color = CardioTheme.colors.textSecondary,
+                            )
+                        }
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        ProfileInputField(
+                            value = uiState.patientId,
+                            onValueChange = onPatientIdChange,
+                            placeholder = "PT-7GZVL7PT",
+                            enabled = !isIdLocked,
+                            onDone = { focusManager.clearFocus(); isIdLocked = true },
+                            modifier = Modifier.weight(1f),
+                        )
+                        if (isIdLocked) {
+                            Box(
+                                modifier = Modifier
+                                    .height(60.dp)
+                                    .clip(ProfileCardShape)
+                                    .background(COLOR_MANUAL_BUTTON)
+                                    .clickable { isIdLocked = false }
+                                    .padding(horizontal = 16.dp),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                ) {
+                                    Text(
+                                        text = "Изменить",
+                                        style = CardioTheme.typography.navLabel,
+                                        color = CardioTheme.colors.textMain,
+                                    )
+                                    Icon(
+                                        imageVector = Icons.Default.Edit,
+                                        contentDescription = null,
+                                        tint = CardioTheme.colors.textMain,
+                                        modifier = Modifier.size(16.dp),
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             item {
-                DateInputField(
-                    label = "Дата рождения",
-                    value = uiState.birthDate.toDisplayDate(),
-                    onClick = { showDatePicker = true },
-                    modifier = Modifier.padding(horizontal = CONTENT_HORIZONTAL_PADDING),
-                )
+                Column(modifier = Modifier.padding(horizontal = CONTENT_HORIZONTAL_PADDING)) {
+                    Text(
+                        text = "Дата рождения",
+                        style = CardioTheme.typography.bodySmall,
+                        color = CardioTheme.colors.textSecondary,
+                        modifier = Modifier.padding(bottom = 8.dp),
+                    )
+                    DateInputField(
+                        value = uiState.birthDate.toDisplayDate(),
+                        onClick = { showDatePicker = true },
+                    )
+                }
             }
 
             item {
-                Text(
-                    text = "Возрастная группа",
-                    style = CardioTheme.typography.cardTitle,
-                    color = CardioTheme.colors.textMain,
-                    modifier = Modifier.padding(horizontal = CONTENT_HORIZONTAL_PADDING + 4.dp),
-                )
-            }
-
-            item {
-                AgeGroupDropdown(
-                    selected = uiState.ageGroup,
-                    useCustomLimits = uiState.useCustomLimits,
-                    onSelect = onAgeGroupChange,
-                    modifier = Modifier.padding(horizontal = CONTENT_HORIZONTAL_PADDING),
-                )
+                Column(modifier = Modifier.padding(horizontal = CONTENT_HORIZONTAL_PADDING)) {
+                    Text(
+                        text = "Возрастная группа",
+                        style = CardioTheme.typography.bodySmall,
+                        color = CardioTheme.colors.textSecondary,
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 0.dp).padding(bottom = 8.dp),
+                    )
+                    AgeGroupDropdown(
+                        selected = uiState.ageGroup,
+                        useCustomLimits = uiState.useCustomLimits,
+                        onSelect = onAgeGroupChange,
+                    )
+                }
             }
 
             item {
@@ -173,8 +288,8 @@ fun ProfileScreen(
                         .padding(horizontal = CONTENT_HORIZONTAL_PADDING),
                     shape = ProfileCardShape,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = CardioTheme.colors.onPrimary,
-                        contentColor = CardioTheme.colors.textMain,
+                        containerColor = COLOR_MANUAL_BUTTON,
+                        contentColor = CardioTheme.colors.textSecondary,
                     ),
                 ) {
                     Text("Заполнить вручную", style = CardioTheme.typography.bodyMedium)
@@ -190,9 +305,7 @@ fun ProfileScreen(
             item {
                 MedicationsCard(
                     takesWarfarin = uiState.takesWarfarin,
-                    valveType = uiState.valveType,
                     onTakesWarfarinChange = onTakesWarfarinChange,
-                    onValveTypeChange = onValveTypeChange,
                     modifier = Modifier.padding(horizontal = CONTENT_HORIZONTAL_PADDING),
                 )
             }
@@ -215,17 +328,58 @@ fun ProfileScreen(
 private fun buildMetricDisplays(uiState: ProfileUiState): List<MetricDisplay> {
     val limits = uiState.limitsForAgeGroup ?: return emptyList()
     val edit = uiState.customLimitsEdit
+    val useCustom = uiState.useCustomLimits && edit != null
     val result = mutableListOf<MetricDisplay>()
 
-    limits.singleMetricLimits.find { it.metricType == MetricType.HeartRate }
-        ?.let { result.add(it.toDisplay("ЧСС (уд/мин)")) }
-    limits.bloodPressureLimits?.let { result.add(it.toDisplay()) }
-    limits.singleMetricLimits.find { it.metricType == MetricType.OxygenSaturation }
-        ?.let { result.add(it.toDisplay("Сатурация (%)")) }
+    if (useCustom && edit != null && edit.hrNormalMin.isNotBlank()) {
+        result.add(
+            MetricDisplay(
+                metricType = MetricType.HeartRate,
+                title = "ЧСС (уд/мин)",
+                normalText = "${edit.hrNormalMin}–${edit.hrNormalMax}",
+                attentionText = edit.hrAttentionMin.takeIf { it.isNotBlank() }
+                    ?.let { "${it}–${edit.hrAttentionMax}" },
+                doctorText = edit.hrDoctorMax.takeIf { it.isNotBlank() }?.let { "< $it" },
+            )
+        )
+    } else {
+        limits.singleMetricLimits.find { it.metricType == MetricType.HeartRate }
+            ?.let { result.add(it.toDisplay("ЧСС (уд/мин)")) }
+    }
+
+    if (useCustom && edit != null && edit.bpSystolicMin.isNotBlank()) {
+        result.add(
+            MetricDisplay(
+                metricType = MetricType.BloodPressure,
+                title = "АД (мм рт. ст.)",
+                normalText = "${edit.bpSystolicMin}–${edit.bpSystolicMax}/${edit.bpDiastolicMin}–${edit.bpDiastolicMax}",
+                attentionText = null,
+                doctorText = null,
+            )
+        )
+    } else {
+        limits.bloodPressureLimits?.let { result.add(it.toDisplay()) }
+    }
+
+    if (useCustom && edit != null && edit.spO2NormalMin.isNotBlank()) {
+        result.add(
+            MetricDisplay(
+                metricType = MetricType.OxygenSaturation,
+                title = "Сатурация (%)",
+                normalText = "${edit.spO2NormalMin}–${edit.spO2NormalMax}",
+                attentionText = edit.spO2AttentionMin.takeIf { it.isNotBlank() }
+                    ?.let { "${it}–${edit.spO2AttentionMax}" },
+                doctorText = edit.spO2DoctorMax.takeIf { it.isNotBlank() }?.let { "< $it" },
+            )
+        )
+    } else {
+        limits.singleMetricLimits.find { it.metricType == MetricType.OxygenSaturation }
+            ?.let { result.add(it.toDisplay("Сатурация (%)")) }
+    }
 
     if (uiState.takesWarfarin) {
         result.add(
-            if (uiState.useCustomLimits && edit != null && edit.inrNormalMin.isNotBlank()) {
+            if (useCustom && edit != null && edit.inrNormalMin.isNotBlank()) {
                 MetricDisplay(
                     metricType = MetricType.INR,
                     title = "МНО",

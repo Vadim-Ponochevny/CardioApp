@@ -5,6 +5,7 @@ data class SurveyLink(
     val title: String,
     val url: String,
     val isActive: Boolean,
+    val isNew: Boolean = false,
     val createdAt: Long,
     val updatedAt: Long,
 )

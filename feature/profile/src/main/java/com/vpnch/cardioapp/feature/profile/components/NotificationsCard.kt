@@ -1,17 +1,13 @@
 package com.vpnch.cardioapp.feature.profile.components
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.ui.Modifier
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Modifier
 import com.vpnch.cardioapp.core.ui.theme.CardioTheme
 
 @Composable
@@ -21,28 +17,16 @@ internal fun NotificationsCard(
     modifier: Modifier = Modifier,
 ) {
     ProfileCard(modifier = modifier) {
-        Text(
-            text = "Уведомления",
-            style = CardioTheme.typography.cardTitle,
-            color = CardioTheme.colors.textMain,
-        )
-        Spacer(Modifier.height(12.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "Ежедневное напоминание",
-                    style = CardioTheme.typography.bodySmall,
-                    color = CardioTheme.colors.textMain,
-                )
-                Text(
-                    text = "Принять витаминки и записать показатели",
-                    style = CardioTheme.typography.bodySmall,
-                    color = CardioTheme.colors.textSecondary,
-                )
-            }
+            Text(
+                text = "Ежедневное напоминание",
+                style = CardioTheme.typography.bodySmall,
+                color = CardioTheme.colors.textMain,
+                modifier = Modifier.weight(1f),
+            )
             Switch(
                 checked = enabled,
                 onCheckedChange = onEnabledChange,
