@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.hilt.android)
     implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.androidx.appcompat)
     implementation(libs.appmetrica.analytics)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)

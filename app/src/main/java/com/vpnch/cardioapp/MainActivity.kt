@@ -18,6 +18,8 @@ import com.vpnch.cardioapp.worker.NOTIFICATION_TYPE_DAILY
 import com.vpnch.cardioapp.worker.NOTIFICATION_TYPE_SURVEY
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -27,6 +29,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
         val initialRoute = when (intent.getStringExtra(EXTRA_NOTIFICATION_TYPE)) {
             NOTIFICATION_TYPE_SURVEY -> {
